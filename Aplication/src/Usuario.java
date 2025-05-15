@@ -44,6 +44,10 @@ public class Usuario {
         return telefono;
     }
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
     public String getCorreo() {
         return correo;
     }
@@ -65,3 +69,6 @@ public class Usuario {
                 '}';
     }
 }
+
+
+
