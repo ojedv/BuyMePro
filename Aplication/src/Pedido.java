@@ -2,8 +2,6 @@ public class Pedido {
     private int idPedido;
     private int idUsuario;
 
-    // Constructor vacío
-
     // Constructor con todos los campos
     public Pedido(int idUsuario) {
         this.idUsuario = idUsuario;

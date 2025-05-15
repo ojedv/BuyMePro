@@ -1,11 +1,17 @@
+import java.util.List;
+
 public class Supermercado {
     private int id_supermercado;
     private String nombre;
+    List<Producto> productos;
 
     public Supermercado() {}
 
     public Supermercado(String nombre) {
         this.nombre = nombre;
+    }
+    public void añadirProducto(Producto producto) {
+        productos.add(producto);
     }
 
     public int getId_supermercado() {
