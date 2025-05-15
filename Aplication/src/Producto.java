@@ -19,6 +19,13 @@ public class Producto {
     // Getters y Setters
 
 
+    public void setIdProducto(int idProducto) {
+        this.idProducto = idProducto;
+    }
+    public int getIdProducto() {
+        return idProducto;
+    }
+
     public String getNombre() {
         return nombre;
     }
