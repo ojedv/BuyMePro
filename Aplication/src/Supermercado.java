@@ -10,6 +10,7 @@ public class Supermercado {
     public Supermercado(String nombre) {
         this.nombre = nombre;
     }
+
     public void añadirProducto(Producto producto) {
         productos.add(producto);
     }

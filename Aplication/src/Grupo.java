@@ -10,7 +10,9 @@ public class Grupo {
         this.nombre = nombre;
     }
 
-
+    public void añadirSupermercado(Supermercado supermercado) {
+        supermercados.add(supermercado);
+    }
     // Getters y Setters
     public int getIdGrupo() {
         return idGrupo;
