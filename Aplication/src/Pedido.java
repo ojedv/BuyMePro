@@ -3,7 +3,6 @@ public class Pedido {
     private int idUsuario;
 
     // Constructor vacío
-    public Pedido() {}
 
     // Constructor con todos los campos
     public Pedido(int idUsuario) {
@@ -23,9 +22,6 @@ public class Pedido {
         return idUsuario;
     }
 
-    public void setIdUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
-    }
 
     @Override
     public String toString() {
