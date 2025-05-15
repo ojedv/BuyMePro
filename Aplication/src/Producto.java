@@ -19,10 +19,6 @@ public class Producto {
     // Getters y Setters
 
 
-    public void setIdProducto(int idProducto) {
-        this.idProducto = idProducto;
-    }
-
     public String getNombre() {
         return nombre;
     }
