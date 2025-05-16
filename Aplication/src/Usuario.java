@@ -1,7 +1,7 @@
 public class Usuario {
     private int id_usuario;
     private String nickname;
-    private String contraseña;
+    private String password;
     private String nombre;
     private String apellidos;
     private String telefono;
@@ -9,7 +9,7 @@ public class Usuario {
 
     public Usuario(String nickname, String contraseña, String nombre, String apellidos, String telefono, String correo) {
         this.nickname = nickname;
-        this.contraseña = contraseña;
+        this.password = contraseña;
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.telefono = telefono;
@@ -28,8 +28,8 @@ public class Usuario {
         return nickname;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getPassword() {
+        return password;
     }
 
     public String getNombre() {
@@ -61,7 +61,7 @@ public class Usuario {
         return "Usuario{" +
                 "id_usuario=" + id_usuario +
                 ", nickname='" + nickname + '\'' +
-                ", contraseña='" + contraseña + '\'' +
+                ", contraseña='" + password + '\'' +
                 ", nombre='" + nombre + '\'' +
                 ", apellidos='" + apellidos + '\'' +
                 ", telefono='" + telefono + '\'' +
