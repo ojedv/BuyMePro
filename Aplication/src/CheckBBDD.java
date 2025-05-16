@@ -42,7 +42,7 @@ public class CheckBBDD {
 
         } catch (SQLException e) {
             System.err.println("Error al comprobar usuario: " + e.getMessage());
-            return false; // En caso de error, mejor retornar false por seguridad
+            return false; // En caso de error, mejor retornar false por seguridad.
         }
 
         return count == 0; // Si no hay registros con el mismo nickname o correo, puede añadirse
