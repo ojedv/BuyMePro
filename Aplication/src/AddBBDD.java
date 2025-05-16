@@ -11,6 +11,14 @@ public class AddBBDD {
         this.conexionBD = conexionBD;
     }
 
+    /*
+    Esta clase nos añade los atributos de cada clase previamente creada en Java a la BBDD usamos el add
+    y pasamos como parametro lo que vayamos a insertar
+    Ej:
+    add(Usuario): Hacemos uso de los Getters para rellenar la insercion SQL que ejecutamos en este mismo
+    metodo.
+    */
+
     // Este metodo tambien serviria para añadir usuarios a la base de datos pero es mas inseguro.
     /*public void añadir(Usuario usuario) {
         String sql = "INSERT INTO usuario (nickname, contraseña, nombre, apellidos, telefono, correo) " +

@@ -11,6 +11,14 @@ public class CheckBBDD {
         this.conexionBD = conexionBD;
     }
 
+    /*
+    Esta clase sirve para revisar si los datos que despues introduciremos con el AddBBDD, ya estan creados
+    en la BBDD en cada metodo se especifica con el parametro la revision que se hace.
+    Ej:
+    check(Usuario): Revisamos si ya existe un usuario con ese nombre o correo (Devuelve booleano)
+    */
+
+
     /**
      * Verifica si un Usuario ya existe en la base de datos basado en su nickname o correo.
      * @param usuario El usuario a verificar
