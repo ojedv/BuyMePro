@@ -261,6 +261,6 @@ public class UsuarioDAO {
             }
         }
 
-        ConexionBD.cerrarConexion();
+        ConexionBD.cerrarConexion(conexion);
     }
 }

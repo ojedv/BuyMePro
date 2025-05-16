@@ -27,7 +27,7 @@ public class ConexionBD {
     }
 
     // Método para cerrar la conexión
-    public static void cerrarConexion() {
+    public static void cerrarConexion(Connection conexion) {
         if (conexion != null) {
             try {
                 conexion.close();
