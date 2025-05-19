@@ -42,13 +42,7 @@ public class WelcomeIPanel extends JPanel implements IPanelSwitcher {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        //Imagen icono
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/img/LogoBMP.png"));
-            icon.setImage(icon.getImage());
-        } catch (Exception e) {
-            System.err.println("Error: No se pudo cargar el icono. " + e.getMessage());
-        }
+
 
         // Descripción
         JLabel descLabel = new JLabel("Tu aplicación para gestionar compras");

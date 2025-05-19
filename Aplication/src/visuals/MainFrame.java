@@ -23,7 +23,7 @@ public class MainFrame extends JFrame implements IPanelSwitcher {
      */
     public MainFrame() {
         // Configurar ventana
-        setTitle("BuyMe Application");
+        setTitle("BuyMeProyect");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 500);
         setLocationRelativeTo(null);
@@ -35,6 +35,13 @@ public class MainFrame extends JFrame implements IPanelSwitcher {
         // Mostrar ventana
         setVisible(true);
 
+        //Imagen icono
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/img/LogoBMP.png"));
+            setIconImage(icon.getImage()); // Establecer el icono en el JFrame
+        } catch (Exception e) {
+            System.err.println("Error: No se pudo cargar el icono. " + e.getMessage());
+        }
     }
 
     @Override
