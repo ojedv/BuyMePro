@@ -1,3 +1,5 @@
+package GestionBBDD;
+
 import java.sql.Connection;//Establecer conexión
 import java.sql.DriverManager;//Establecer conexión
 import java.sql.PreparedStatement;
@@ -8,7 +10,7 @@ import java.sql.Statement;//Lanzar consultas sql
 
 public class ConexionBD {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/instituto";
+    private static final String URL = "jdbc:mysql://localhost:3306/BuyMeProject";
     private static final String USUARIO = "root";
     private static final String PASSWORD = "";
 
