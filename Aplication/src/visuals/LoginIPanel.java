@@ -85,7 +85,7 @@ public class LoginIPanel extends JPanel implements IPanelSwitcher {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                attemptLogin();
+                IPanelSwitcher.openPanel(new RoleSelectionPanel(IPanelSwitcher, nicknameField.getText()));
             }
         });
 
@@ -99,31 +99,7 @@ public class LoginIPanel extends JPanel implements IPanelSwitcher {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    /**
-     * Método para intentar iniciar sesión
-     */
-    private void attemptLogin() {
-        String nickname = nicknameField.getText();
-        String password = new String(passwordField.getPassword());
 
-        if (nickname.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Por favor, complete todos los campos",
-                    "Error de inicio de sesión",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Aquí iría la verificación real con la base de datos
-        // Por ahora, simplemente mostraremos un mensaje de éxito
-        JOptionPane.showMessageDialog(this,
-                "Inicio de sesión exitoso!\nBienvenido, " + nickname,
-                "Inicio de sesión",
-                JOptionPane.INFORMATION_MESSAGE);
-
-        // Aquí deberías navegar al panel principal de la aplicación
-        // Por ejemplo: panelSwitcher.openPanel(new MainAppPanel(panelSwitcher));
-    }
 
     @Override
     public void closePanel(JPanel panel) {
