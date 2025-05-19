@@ -1,22 +1,21 @@
 import GestionBBDD.*;
 import Objetos.*;
 
+import javax.script.ScriptEngine;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainPruebas {
+
+
     public static void main(String[] args) {
 
         ConexionBD conexionBD = new ConexionBD();
 
-        Usuario usuarioPrueba = new Usuario(
-                "prueba123",          // nickname
-                "1234",               // contraseña (password)
-                "Pedro",              // nombre
-                "Pérez",              // apellidos
-                "666777888",          // teléfono
-                "prueba@email.com"    // correo
-        );
-
         CheckBBDD checker = new CheckBBDD(conexionBD);
         AddBBDD adder = new AddBBDD(conexionBD);
-        adder.add(usuarioPrueba);
+        DeleteBBDD deleter = new DeleteBBDD(conexionBD);
+
+
     }
 }
