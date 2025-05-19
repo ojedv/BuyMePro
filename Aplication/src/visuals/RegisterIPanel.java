@@ -112,7 +112,14 @@ public class RegisterIPanel extends JPanel implements IPanelSwitcher {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                attemptRegister();
+                if(checker.checkNickname(nicknameField.getText())) {
+                    attemptRegister();
+                }else {
+                    JOptionPane.showMessageDialog(RegisterIPanel.this,
+                            "El nickname ya está en uso",
+                            "Error de registro",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 

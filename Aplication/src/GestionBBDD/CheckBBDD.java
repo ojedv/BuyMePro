@@ -47,6 +47,28 @@ public class CheckBBDD {
 
         return count == 0;
     }
+    public boolean checkNickname(String nickname) {
+        String sql = "SELECT COUNT(nickname) AS Coincidencias FROM usuario WHERE nickname = ?";
+        int count = 0;
+
+        try (Connection conexion = conexionBD.getConnection();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setString(1, nickname);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt("Coincidencias");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al comprobar nickname: " + e.getMessage());
+            return false; // O podrías lanzar excepción según manejo que prefieras
+        }
+
+        return count > 0; // true si existe al menos uno con ese nickname
+    }
 
     /**
      * Verifica si un Producto ya existe en la base de datos por su nombre.

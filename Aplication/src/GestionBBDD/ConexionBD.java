@@ -19,7 +19,7 @@ public class ConexionBD {
         }
     }
 
-    public Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USUARIO, PASSWORD);
     }
 

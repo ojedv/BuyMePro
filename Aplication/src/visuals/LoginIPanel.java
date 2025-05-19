@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import GestionBBDD.CheckBBDD;
 import GestionBBDD.ConexionBD;
+import Objetos.Usuario;
 import interfaces.IPanelSwitcher;
 
 /**
@@ -85,7 +86,9 @@ public class LoginIPanel extends JPanel implements IPanelSwitcher {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 IPanelSwitcher.openPanel(new RoleSelectionPanel(IPanelSwitcher, nicknameField.getText()));
+
             }
         });
 
