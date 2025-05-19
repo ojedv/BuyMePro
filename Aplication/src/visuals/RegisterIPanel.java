@@ -1,22 +1,22 @@
 package visuals;
 
-import GestionBBDD.CheckBBDD;
-import GestionBBDD.AddBBDD;
-import Objetos.Usuario;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Panel de registro para nuevos usuarios
- */
-public class RegisterPanel extends JPanel {
+import GestionBBDD.AddBBDD;
+import GestionBBDD.CheckBBDD;
+import GestionBBDD.ConexionBD;
+import Objetos.Usuario;
+import interfaces.IPanelSwitcher;
 
-    private PanelManager panelManager;
-    private CheckBBDD checker;
-    private AddBBDD adder;
+/**
+ * Panel simplificado para registro de usuarios
+ */
+public class RegisterIPanel extends JPanel implements IPanelSwitcher {
+    // Referencia al gestor de paneles
+    private IPanelSwitcher IPanelSwitcher;
 
     // Componentes de la interfaz
     private JTextField nicknameField;
@@ -26,25 +26,32 @@ public class RegisterPanel extends JPanel {
     private JTextField telefonoField;
     private JTextField correoField;
 
+    // Para la base de datos
+    private CheckBBDD checker;
+    private AddBBDD adder;
+
     /**
      * Constructor del panel de registro
-     * @param panelManager Gestor de paneles para la navegación
-     * @param checker Objeto para verificar usuario en la BD
-     * @param adder Objeto para añadir usuario a la BD
+     * @param IPanelSwitcher Gestor para cambiar entre paneles
      */
-    public RegisterPanel(PanelManager panelManager, CheckBBDD checker, AddBBDD adder) {
-        this.panelManager = panelManager;
-        this.checker = checker;
-        this.adder = adder;
-        initComponents();
+    public RegisterIPanel(IPanelSwitcher IPanelSwitcher) {
+        this.IPanelSwitcher = IPanelSwitcher;
+
+        // Inicializar objetos de base de datos
+        ConexionBD conexionBD = new ConexionBD();
+        this.checker = new CheckBBDD(conexionBD);
+        this.adder = new AddBBDD(conexionBD);
+
+        setupPanel();
     }
 
     /**
-     * Inicializa los componentes de la interfaz
+     * Configura los componentes del panel
      */
-    private void initComponents() {
-        // Configurar layout
-        setLayout(new BorderLayout());
+    private void setupPanel() {
+        // Usar BorderLayout como layout principal
+        setLayout(new BorderLayout(20, 20));
+        setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
 
         // Panel de título
         JPanel titlePanel = new JPanel();
@@ -53,98 +60,55 @@ public class RegisterPanel extends JPanel {
         titlePanel.add(titleLabel);
 
         // Panel de formulario
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 10, 5, 10);
+        JPanel formPanel = new JPanel(new GridLayout(6, 2, 10, 15));
 
         // Nickname
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        formPanel.add(new JLabel("Nickname:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
+        formPanel.add(new JLabel("Nickname:"));
         nicknameField = new JTextField(20);
-        formPanel.add(nicknameField, gbc);
+        formPanel.add(nicknameField);
 
         // Contraseña
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 0.0;
-        formPanel.add(new JLabel("Contraseña:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
+        formPanel.add(new JLabel("Contraseña:"));
         passwordField = new JPasswordField(20);
-        formPanel.add(passwordField, gbc);
+        formPanel.add(passwordField);
 
         // Nombre
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 0.0;
-        formPanel.add(new JLabel("Nombre:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
+        formPanel.add(new JLabel("Nombre:"));
         nombreField = new JTextField(20);
-        formPanel.add(nombreField, gbc);
+        formPanel.add(nombreField);
 
         // Apellidos
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.weightx = 0.0;
-        formPanel.add(new JLabel("Apellidos:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.weightx = 1.0;
+        formPanel.add(new JLabel("Apellidos:"));
         apellidosField = new JTextField(20);
-        formPanel.add(apellidosField, gbc);
+        formPanel.add(apellidosField);
 
         // Teléfono
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.weightx = 0.0;
-        formPanel.add(new JLabel("Teléfono:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
+        formPanel.add(new JLabel("Teléfono:"));
         telefonoField = new JTextField(20);
-        formPanel.add(telefonoField, gbc);
+        formPanel.add(telefonoField);
 
         // Correo
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.weightx = 0.0;
-        formPanel.add(new JLabel("Correo:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 5;
-        gbc.weightx = 1.0;
+        formPanel.add(new JLabel("Correo:"));
         correoField = new JTextField(20);
-        formPanel.add(correoField, gbc);
+        formPanel.add(correoField);
 
         // Panel de botones
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
 
         // Botón volver
         JButton backButton = new JButton("Volver");
+        backButton.setPreferredSize(new Dimension(120, 40));
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                clearFields();
-                panelManager.showPanel("welcome");
+                // Volver al panel de bienvenida
+                IPanelSwitcher.openPanel(new WelcomeIPanel(IPanelSwitcher));
             }
         });
 
         // Botón registrar
         JButton registerButton = new JButton("Registrar");
+        registerButton.setPreferredSize(new Dimension(120, 40));
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -156,17 +120,14 @@ public class RegisterPanel extends JPanel {
         buttonPanel.add(backButton);
         buttonPanel.add(registerButton);
 
-        // Añadir todos los paneles al contenedor principal
+        // Añadir paneles al contenedor principal
         add(titlePanel, BorderLayout.NORTH);
         add(formPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
-
-        // Añadir padding
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     }
 
     /**
-     * Intenta registrar un nuevo usuario con los datos proporcionados
+     * Método para intentar registrar un usuario
      */
     private void attemptRegister() {
         // Obtener valores de los campos
@@ -208,8 +169,9 @@ public class RegisterPanel extends JPanel {
                     "¡Registro exitoso!\nAhora puede iniciar sesión",
                     "Registro completado",
                     JOptionPane.INFORMATION_MESSAGE);
-            clearFields();
-            panelManager.showPanel("login");
+
+            // Navegar al panel de login
+            IPanelSwitcher.openPanel(new LoginIPanel(IPanelSwitcher));
         } else {
             JOptionPane.showMessageDialog(this,
                     "Ocurrió un error durante el registro",
@@ -218,15 +180,13 @@ public class RegisterPanel extends JPanel {
         }
     }
 
-    /**
-     * Limpia los campos del formulario
-     */
-    private void clearFields() {
-        nicknameField.setText("");
-        passwordField.setText("");
-        nombreField.setText("");
-        apellidosField.setText("");
-        telefonoField.setText("");
-        correoField.setText("");
+    @Override
+    public void closePanel(JPanel panel) {
+
+    }
+
+    @Override
+    public void openPanel(JPanel panel) {
+
     }
 }

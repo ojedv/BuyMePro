@@ -1,34 +1,39 @@
 package visuals;
 
+import interfaces.IPanelSwitcher;
+import javax.swing.ImageIcon;
+
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Panel de bienvenida que ofrece opciones para iniciar sesión o registrarse
+ * Panel de bienvenida simplificado
  */
-public class WelcomePanel extends JPanel {
-
-    private PanelManager panelManager;
+public class WelcomeIPanel extends JPanel implements IPanelSwitcher {
+    // Referencia al gestor de paneles
+    private IPanelSwitcher IPanelSwitcher;
 
     /**
      * Constructor del panel de bienvenida
-     * @param panelManager Gestor de paneles para la navegación
+     * @param IPanelSwitcher Gestor para cambiar entre paneles
      */
-    public WelcomePanel(PanelManager panelManager) {
-        this.panelManager = panelManager;
-        initComponents();
+    public WelcomeIPanel(IPanelSwitcher IPanelSwitcher) {
+        this.IPanelSwitcher = IPanelSwitcher;
+        setupPanel();
     }
 
     /**
-     * Inicializa los componentes de la interfaz
+     * Configura los componentes del panel
      */
-    private void initComponents() {
-        // Configurar el layout
-        setLayout(new BorderLayout());
+    private void setupPanel() {
+        // Usar BorderLayout para organizar los elementos
+        setLayout(new BorderLayout(20, 20));
+        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Panel central con título y logo
+        // Panel central con título y descripción
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
@@ -37,28 +42,29 @@ public class WelcomePanel extends JPanel {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        //Imagen icono
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/img/LogoBMP.png"));
+            icon.setImage(icon.getImage());
+        } catch (Exception e) {
+            System.err.println("Error: No se pudo cargar el icono. " + e.getMessage());
+        }
+
         // Descripción
         JLabel descLabel = new JLabel("Tu aplicación para gestionar compras");
         descLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Espacio para un logo (simulado con un área vacía)
-        JPanel logoPanel = new JPanel();
-        logoPanel.setPreferredSize(new Dimension(200, 100));
-        logoPanel.setBackground(new Color(220, 240, 255));
-        logoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         // Añadir componentes al panel central
-        centerPanel.add(Box.createVerticalStrut(50));
+        centerPanel.add(Box.createVerticalGlue());
         centerPanel.add(titleLabel);
-        centerPanel.add(Box.createVerticalStrut(20));
+        centerPanel.add(Box.createVerticalStrut(15));
         centerPanel.add(descLabel);
-        centerPanel.add(Box.createVerticalStrut(30));
-        centerPanel.add(logoPanel);
+        centerPanel.add(Box.createVerticalGlue());
 
         // Panel para botones
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
 
         // Botón de inicio de sesión
         JButton loginButton = new JButton("Iniciar Sesión");
@@ -67,7 +73,8 @@ public class WelcomePanel extends JPanel {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                panelManager.showPanel("login");
+                // Cambiar al panel de login
+                IPanelSwitcher.openPanel(new LoginIPanel(IPanelSwitcher));
             }
         });
 
@@ -78,7 +85,8 @@ public class WelcomePanel extends JPanel {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                panelManager.showPanel("register");
+                // Cambiar al panel de registro
+                IPanelSwitcher.openPanel(new RegisterIPanel(IPanelSwitcher));
             }
         });
 
@@ -89,8 +97,17 @@ public class WelcomePanel extends JPanel {
         // Añadir paneles al contenedor principal
         add(centerPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
+    }
 
-        // Añadir padding
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+
+    @Override
+    public void closePanel(JPanel panel) {
+
+    }
+
+    @Override
+    public void openPanel(JPanel panel) {
+
     }
 }
