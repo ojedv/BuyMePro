@@ -3,14 +3,13 @@ package visuals;
 import interfaces.IPanelSwitcher;
 import javax.swing.ImageIcon;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Panel de bienvenida simplificado
+ * Panel de bienvenida estilizado
  */
 public class WelcomeIPanel extends JPanel implements IPanelSwitcher {
     // Referencia al gestor de paneles
@@ -29,41 +28,57 @@ public class WelcomeIPanel extends JPanel implements IPanelSwitcher {
      * Configura los componentes del panel
      */
     private void setupPanel() {
-        // Usar BorderLayout para organizar los elementos
-        setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        // Configuración del panel
+        setLayout(new BorderLayout());
+        setBackground(UITheme.WHITE);
+        setBorder(BorderFactory.createEmptyBorder(40, 50, 40, 50));
 
-        // Panel central con título y descripción
+        // Panel central con disposición de caja vertical
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBackground(UITheme.WHITE);
 
-        // Título
+        // Añadir logo
+        try {
+            ImageIcon originalIcon = new ImageIcon(getClass().getResource("/img/LogoBMP.png"));
+            // Redimensionar logo para que se vea bien
+            Image img = originalIcon.getImage();
+            Image resizedImg = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+            ImageIcon logoIcon = new ImageIcon(resizedImg);
+
+            JLabel logoLabel = new JLabel(logoIcon);
+            logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            centerPanel.add(logoLabel);
+            centerPanel.add(Box.createVerticalStrut(30));
+        } catch (Exception e) {
+            System.err.println("Error: No se pudo cargar el logo. " + e.getMessage());
+        }
+
+        // Título principal
         JLabel titleLabel = new JLabel("¡Bienvenido a BuyMe!");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        UITheme.applyTitleLabelStyle(titleLabel);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-
-
-        // Descripción
-        JLabel descLabel = new JLabel("Tu aplicación para gestionar compras");
-        descLabel.setFont(new Font("Arial", Font.PLAIN, 18));
-        descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Añadir componentes al panel central
-        centerPanel.add(Box.createVerticalGlue());
         centerPanel.add(titleLabel);
         centerPanel.add(Box.createVerticalStrut(15));
-        centerPanel.add(descLabel);
-        centerPanel.add(Box.createVerticalGlue());
 
-        // Panel para botones
+        // Subtítulo
+        JLabel descLabel = new JLabel("Tu aplicación para gestionar compras");
+        UITheme.applySubtitleLabelStyle(descLabel);
+        descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(descLabel);
+        centerPanel.add(Box.createVerticalStrut(40));
+
+        // Panel para botones con efecto de sombra
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        buttonPanel.setLayout(new GridLayout(1, 2, 20, 0));
+        buttonPanel.setBackground(UITheme.WHITE);
+        buttonPanel.setMaximumSize(new Dimension(400, 50));
+        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Botón de inicio de sesión
         JButton loginButton = new JButton("Iniciar Sesión");
-        loginButton.setPreferredSize(new Dimension(150, 40));
-        loginButton.setFont(new Font("Arial", Font.BOLD, 14));
+        loginButton.setPreferredSize(new Dimension(180, 50));
+        UITheme.applyPrimaryButtonStyle(loginButton);
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -74,8 +89,8 @@ public class WelcomeIPanel extends JPanel implements IPanelSwitcher {
 
         // Botón de registro
         JButton registerButton = new JButton("Registrarse");
-        registerButton.setPreferredSize(new Dimension(150, 40));
-        registerButton.setFont(new Font("Arial", Font.BOLD, 14));
+        registerButton.setPreferredSize(new Dimension(180, 50));
+        UITheme.applySecondaryButtonStyle(registerButton);
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -87,21 +102,27 @@ public class WelcomeIPanel extends JPanel implements IPanelSwitcher {
         // Añadir botones al panel
         buttonPanel.add(loginButton);
         buttonPanel.add(registerButton);
+        centerPanel.add(buttonPanel);
 
-        // Añadir paneles al contenedor principal
+        // Versión de la aplicación
+        JLabel versionLabel = new JLabel("v1.0");
+        versionLabel.setFont(UITheme.SMALL_FONT);
+        versionLabel.setForeground(Color.GRAY);
+        versionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(Box.createVerticalStrut(30));
+        centerPanel.add(versionLabel);
+
+        // Añadir panel central al contenedor principal
         add(centerPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
     }
-
-
 
     @Override
     public void closePanel(JPanel panel) {
-
+        // Implementación requerida por la interfaz
     }
 
     @Override
     public void openPanel(JPanel panel) {
-
+        // Implementación requerida por la interfaz
     }
 }

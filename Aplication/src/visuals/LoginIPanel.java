@@ -10,7 +10,7 @@ import Objetos.Usuario;
 import interfaces.IPanelSwitcher;
 
 /**
- * Panel simplificado para inicio de sesión
+ * Panel estilizado para inicio de sesión
  */
 public class LoginIPanel extends JPanel implements IPanelSwitcher {
     // Referencia al gestor de paneles
@@ -43,35 +43,74 @@ public class LoginIPanel extends JPanel implements IPanelSwitcher {
      * Configura los componentes del panel
      */
     private void setupPanel() {
-        // Usar BorderLayout como layout principal
-        setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+        // Configuración del panel
+        setLayout(new BorderLayout());
+        setBackground(UITheme.WHITE);
+        setBorder(BorderFactory.createEmptyBorder(40, 50, 40, 50));
 
         // Panel de título
-        JPanel titlePanel = new JPanel();
-        JLabel titleLabel = new JLabel("Iniciar Sesión");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titlePanel.add(titleLabel);
+        JPanel titlePanel = UITheme.createTitlePanel("Iniciar Sesión");
 
-        // Panel de formulario
-        JPanel formPanel = new JPanel(new GridLayout(2, 2, 10, 20));
+        // Panel central con formulario
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBackground(UITheme.WHITE);
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
-        // Nickname
-        formPanel.add(new JLabel("Nickname:"));
+        // Panel del formulario con espaciado
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(UITheme.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(8, 5, 8, 5);
+
+        // Etiqueta de nickname
+        JLabel nicknameLabel = new JLabel("Nickname");
+        UITheme.applyFormLabelStyle(nicknameLabel);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        formPanel.add(nicknameLabel, gbc);
+
+        // Campo de texto nickname
         nicknameField = new JTextField(20);
-        formPanel.add(nicknameField);
+        UITheme.applyTextFieldStyle(nicknameField);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        formPanel.add(nicknameField, gbc);
 
-        // Contraseña
-        formPanel.add(new JLabel("Contraseña:"));
+        // Espaciado entre campos
+        gbc.gridy = 2;
+        formPanel.add(Box.createVerticalStrut(10), gbc);
+
+        // Etiqueta de contraseña
+        JLabel passwordLabel = new JLabel("Contraseña");
+        UITheme.applyFormLabelStyle(passwordLabel);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        formPanel.add(passwordLabel, gbc);
+
+        // Campo de texto contraseña
         passwordField = new JPasswordField(20);
-        formPanel.add(passwordField);
+        UITheme.applyPasswordFieldStyle(passwordField);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        formPanel.add(passwordField, gbc);
+
+        // Panel de formulario con alineación centrada
+        JPanel formContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        formContainer.setBackground(UITheme.WHITE);
+        formContainer.add(formPanel);
 
         // Panel de botones
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+        buttonPanel.setBackground(UITheme.WHITE);
+        buttonPanel.setMaximumSize(new Dimension(400, 50));
 
         // Botón volver
         backButton = new JButton("Volver");
-        backButton.setPreferredSize(new Dimension(120, 40));
+        UITheme.applySecondaryButtonStyle(backButton);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -82,35 +121,50 @@ public class LoginIPanel extends JPanel implements IPanelSwitcher {
 
         // Botón iniciar sesión
         loginButton = new JButton("Iniciar Sesión");
-        loginButton.setPreferredSize(new Dimension(120, 40));
+        UITheme.applyPrimaryButtonStyle(loginButton);
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Validación del formulario
+                if (nicknameField.getText().isEmpty() || passwordField.getPassword().length == 0) {
+                    JOptionPane.showMessageDialog(LoginIPanel.this,
+                            "Por favor, complete todos los campos",
+                            "Error de inicio de sesión",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
+                // Lógica de inicio de sesión
                 IPanelSwitcher.openPanel(new RoleSelectionPanel(IPanelSwitcher, nicknameField.getText()));
-
             }
         });
 
-        // Añadir botones al panel
+        // Añadir botones al panel de botones
         buttonPanel.add(backButton);
         buttonPanel.add(loginButton);
 
+        // Panel contenedor de botones para centrado
+        JPanel buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonContainer.setBackground(UITheme.WHITE);
+        buttonContainer.add(buttonPanel);
+
+        // Añadir componentes al panel central
+        centerPanel.add(formContainer);
+        centerPanel.add(Box.createVerticalStrut(30));
+        centerPanel.add(buttonContainer);
+
         // Añadir paneles al contenedor principal
         add(titlePanel, BorderLayout.NORTH);
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(centerPanel, BorderLayout.CENTER);
     }
-
-
 
     @Override
     public void closePanel(JPanel panel) {
-
+        // Implementación requerida por la interfaz
     }
 
     @Override
     public void openPanel(JPanel panel) {
-
+        // Implementación requerida por la interfaz
     }
 }

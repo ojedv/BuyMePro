@@ -12,7 +12,7 @@ import Objetos.Usuario;
 import interfaces.IPanelSwitcher;
 
 /**
- * Panel simplificado para registro de usuarios
+ * Panel estilizado para registro de usuarios
  */
 public class RegisterIPanel extends JPanel implements IPanelSwitcher {
     // Referencia al gestor de paneles
@@ -49,55 +49,52 @@ public class RegisterIPanel extends JPanel implements IPanelSwitcher {
      * Configura los componentes del panel
      */
     private void setupPanel() {
-        // Usar BorderLayout como layout principal
-        setLayout(new BorderLayout(20, 20));
+        // Configuración del panel
+        setLayout(new BorderLayout());
+        setBackground(UITheme.WHITE);
         setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
 
         // Panel de título
-        JPanel titlePanel = new JPanel();
-        JLabel titleLabel = new JLabel("Registro de Usuario");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titlePanel.add(titleLabel);
+        JPanel titlePanel = UITheme.createTitlePanel("Registro de Usuario");
 
-        // Panel de formulario
-        JPanel formPanel = new JPanel(new GridLayout(6, 2, 10, 15));
+        // Panel de desplazamiento para formulario (por si la resolución es pequeña)
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBackground(UITheme.WHITE);
 
-        // Nickname
-        formPanel.add(new JLabel("Nickname:"));
-        nicknameField = new JTextField(20);
-        formPanel.add(nicknameField);
+        // Crear el panel de formulario con GridBagLayout para mejor control
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(UITheme.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Contraseña
-        formPanel.add(new JLabel("Contraseña:"));
-        passwordField = new JPasswordField(20);
-        formPanel.add(passwordField);
+        // Configuración de los campos
+        setupFormField(formPanel, gbc, "Nickname:", nicknameField = new JTextField(), 0);
+        setupFormField(formPanel, gbc, "Contraseña:", passwordField = new JPasswordField(), 1);
+        setupFormField(formPanel, gbc, "Nombre:", nombreField = new JTextField(), 2);
+        setupFormField(formPanel, gbc, "Apellidos:", apellidosField = new JTextField(), 3);
+        setupFormField(formPanel, gbc, "Teléfono:", telefonoField = new JTextField(), 4);
+        setupFormField(formPanel, gbc, "Correo:", correoField = new JTextField(), 5);
 
-        // Nombre
-        formPanel.add(new JLabel("Nombre:"));
-        nombreField = new JTextField(20);
-        formPanel.add(nombreField);
+        // JScrollPane en caso de que la pantalla sea pequeña
+        JScrollPane scrollPane = new JScrollPane(formPanel);
+        scrollPane.setBorder(null);
+        scrollPane.setBackground(UITheme.WHITE);
+        scrollPane.getViewport().setBackground(UITheme.WHITE);
 
-        // Apellidos
-        formPanel.add(new JLabel("Apellidos:"));
-        apellidosField = new JTextField(20);
-        formPanel.add(apellidosField);
-
-        // Teléfono
-        formPanel.add(new JLabel("Teléfono:"));
-        telefonoField = new JTextField(20);
-        formPanel.add(telefonoField);
-
-        // Correo
-        formPanel.add(new JLabel("Correo:"));
-        correoField = new JTextField(20);
-        formPanel.add(correoField);
+        // Añadir el scrollPane al panel de contenido
+        contentPanel.add(scrollPane);
+        contentPanel.add(Box.createVerticalStrut(20));
 
         // Panel de botones
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+        buttonPanel.setBackground(UITheme.WHITE);
+        buttonPanel.setMaximumSize(new Dimension(400, 50));
 
         // Botón volver
         JButton backButton = new JButton("Volver");
-        backButton.setPreferredSize(new Dimension(120, 40));
+        UITheme.applySecondaryButtonStyle(backButton);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -108,29 +105,57 @@ public class RegisterIPanel extends JPanel implements IPanelSwitcher {
 
         // Botón registrar
         JButton registerButton = new JButton("Registrar");
-        registerButton.setPreferredSize(new Dimension(120, 40));
+        UITheme.applyPrimaryButtonStyle(registerButton);
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(checker.checkNickname(nicknameField.getText())) {
                     attemptRegister();
-                }else {
-                    JOptionPane.showMessageDialog(RegisterIPanel.this,
-                            "El nickname ya está en uso",
-                            "Error de registro",
-                            JOptionPane.ERROR_MESSAGE);
+                } else {
+                    showErrorDialog("El nickname ya está en uso");
                 }
             }
         });
 
-        // Añadir botones al panel
+        // Añadir botones al panel de botones
         buttonPanel.add(backButton);
         buttonPanel.add(registerButton);
 
+        // Panel contenedor de botones para centrado
+        JPanel buttonContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonContainer.setBackground(UITheme.WHITE);
+        buttonContainer.add(buttonPanel);
+        contentPanel.add(buttonContainer);
+
         // Añadir paneles al contenedor principal
         add(titlePanel, BorderLayout.NORTH);
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(contentPanel, BorderLayout.CENTER);
+    }
+
+    /**
+     * Configura un campo del formulario
+     */
+    private void setupFormField(JPanel panel, GridBagConstraints gbc, String labelText, JTextField field, int row) {
+        // Etiqueta
+        JLabel label = new JLabel(labelText);
+        UITheme.applyFormLabelStyle(label);
+        gbc.gridx = 0;
+        gbc.gridy = row * 2;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.2;
+        panel.add(label, gbc);
+
+        // Campo
+        if (field instanceof JPasswordField) {
+            UITheme.applyPasswordFieldStyle((JPasswordField) field);
+        } else {
+            UITheme.applyTextFieldStyle(field);
+        }
+        gbc.gridx = 0;
+        gbc.gridy = row * 2 + 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        panel.add(field, gbc);
     }
 
     /**
@@ -148,11 +173,7 @@ public class RegisterIPanel extends JPanel implements IPanelSwitcher {
         // Validar que todos los campos estén completos
         if (nickname.isEmpty() || password.isEmpty() || nombre.isEmpty() ||
                 apellidos.isEmpty() || telefono.isEmpty() || correo.isEmpty()) {
-
-            JOptionPane.showMessageDialog(this,
-                    "Por favor, complete todos los campos",
-                    "Error de registro",
-                    JOptionPane.ERROR_MESSAGE);
+            showErrorDialog("Por favor, complete todos los campos");
             return;
         }
 
@@ -161,10 +182,7 @@ public class RegisterIPanel extends JPanel implements IPanelSwitcher {
 
         // Verificar si ya existe el usuario
         if (!checker.check(nuevoUsuario)) {
-            JOptionPane.showMessageDialog(this,
-                    "El nickname o correo ya están en uso",
-                    "Error de registro",
-                    JOptionPane.ERROR_MESSAGE);
+            showErrorDialog("El nickname o correo ya están en uso");
             return;
         }
 
@@ -172,28 +190,38 @@ public class RegisterIPanel extends JPanel implements IPanelSwitcher {
         boolean registroExitoso = adder.add(nuevoUsuario);
 
         if (registroExitoso) {
-            JOptionPane.showMessageDialog(this,
+            // Usar mensaje personalizado estilizado
+            JOptionPane optionPane = new JOptionPane(
                     "¡Registro exitoso!\nAhora puede iniciar sesión",
-                    "Registro completado",
                     JOptionPane.INFORMATION_MESSAGE);
+            JDialog dialog = optionPane.createDialog("Registro completado");
+            dialog.setIconImage(new ImageIcon(getClass().getResource("/img/LogoBMP.png")).getImage());
+            dialog.setVisible(true);
 
             // Navegar al panel de login
             IPanelSwitcher.openPanel(new LoginIPanel(IPanelSwitcher));
         } else {
-            JOptionPane.showMessageDialog(this,
-                    "Ocurrió un error durante el registro",
-                    "Error de registro",
-                    JOptionPane.ERROR_MESSAGE);
+            showErrorDialog("Ocurrió un error durante el registro");
         }
+    }
+
+    /**
+     * Muestra un diálogo de error estilizado
+     */
+    private void showErrorDialog(String message) {
+        JOptionPane optionPane = new JOptionPane(message, JOptionPane.ERROR_MESSAGE);
+        JDialog dialog = optionPane.createDialog("Error de registro");
+        dialog.setIconImage(new ImageIcon(getClass().getResource("/img/LogoBMP.png")).getImage());
+        dialog.setVisible(true);
     }
 
     @Override
     public void closePanel(JPanel panel) {
-
+        // Implementación requerida por la interfaz
     }
 
     @Override
     public void openPanel(JPanel panel) {
-
+        // Implementación requerida por la interfaz
     }
 }
