@@ -58,7 +58,7 @@ public class RoleSelectionPanel extends JPanel implements IPanelSwitcher {
         goShoppingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Navegar al panel de selección de supermercados
+                // Navegar al panel de selección de supermercados para comprar
                 IPanelSwitcher.openPanel(new SupermarketSelectionPanel(IPanelSwitcher, currentUserNickname, "comprador"));
             }
         });
@@ -70,7 +70,7 @@ public class RoleSelectionPanel extends JPanel implements IPanelSwitcher {
         getNeedShoppingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Navegar al panel de selección de supermercados para crear lista de compra
+                // Navegar al panel de selección de supermercados para solicitar compras
                 IPanelSwitcher.openPanel(new SupermarketSelectionPanel(IPanelSwitcher, currentUserNickname, "solicitante"));
             }
         });
