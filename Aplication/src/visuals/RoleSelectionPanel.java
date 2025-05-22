@@ -70,16 +70,8 @@ public class RoleSelectionPanel extends JPanel implements IPanelSwitcher {
         getNeedShoppingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Aquí iría la lógica para el rol de solicitar compras
-                // Por ahora, mostraremos un mensaje informativo
-                JOptionPane.showMessageDialog(RoleSelectionPanel.this,
-                        "Has seleccionado el rol de solicitar compras.\n" +
-                                "Pronto un comprador verá tu solicitud.",
-                        "Rol seleccionado",
-                        JOptionPane.INFORMATION_MESSAGE);
-
-                // También podríamos ir a un panel específico para crear la lista de compra
-                // IPanelSwitcher.openPanel(new CreateShoppingListPanel(IPanelSwitcher, currentUserNickname));
+                // Navegar al panel de selección de supermercados para crear lista de compra
+                IPanelSwitcher.openPanel(new SupermarketSelectionPanel(IPanelSwitcher, currentUserNickname, "solicitante"));
             }
         });
 
@@ -94,8 +86,7 @@ public class RoleSelectionPanel extends JPanel implements IPanelSwitcher {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Aquí deberíamos volver al panel anterior (probablemente un panel principal)
-                // Por ahora, volveremos al panel de bienvenida
+                // Volver al panel de bienvenida
                 IPanelSwitcher.openPanel(new WelcomeIPanel(IPanelSwitcher));
             }
         });

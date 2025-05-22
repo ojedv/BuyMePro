@@ -44,9 +44,12 @@ public class SupermarketSelectionPanel extends JPanel implements IPanelSwitcher 
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titlePanel.add(titleLabel);
 
-        // Panel de información
+        // Panel de información con texto dinámico según el rol
         JPanel infoPanel = new JPanel();
-        JLabel infoLabel = new JLabel("Selecciona el supermercado donde quieres realizar la compra:");
+        String infoText = userRole.equals("comprador") ?
+                "Selecciona el supermercado donde quieres realizar la compra:" :
+                "Selecciona el supermercado para crear tu lista de compra:";
+        JLabel infoLabel = new JLabel(infoText);
         infoLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         infoPanel.add(infoLabel);
 
@@ -54,11 +57,19 @@ public class SupermarketSelectionPanel extends JPanel implements IPanelSwitcher 
         JPanel supermarketButtonsPanel = new JPanel(new GridLayout(2, 2, 20, 20));
         supermarketButtonsPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        // Crear los botones para cada supermercado
-        String[] supermarkets = {"Mercadona", "Lidl", "Dia", "Mas"};
+        // Crear los botones para cada supermercado con sus IDs correspondientes
+        String[][] supermarkets = {
+                {"Mercadona", "1"},
+                {"Lidl", "2"},
+                {"Dia", "3"},
+                {"Mas", "4"}
+        };
 
-        for (String supermarket : supermarkets) {
-            JButton marketButton = new JButton(supermarket);
+        for (String[] supermarket : supermarkets) {
+            String name = supermarket[0];
+            String id = supermarket[1];
+
+            JButton marketButton = new JButton(name);
             marketButton.setFont(new Font("Arial", Font.BOLD, 16));
             marketButton.setPreferredSize(new Dimension(150, 100));
 
@@ -66,8 +77,13 @@ public class SupermarketSelectionPanel extends JPanel implements IPanelSwitcher 
             marketButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    // Navegar al panel de actualización de productos con el supermercado seleccionado
-                    IPanelSwitcher.openPanel(new UpdateProductsPanel(IPanelSwitcher, currentUserNickname, supermarket));
+                    if (userRole.equals("comprador")) {
+                        // Para compradores, ir al panel de actualización de productos
+                        IPanelSwitcher.openPanel(new UpdateProductsPanel(IPanelSwitcher, currentUserNickname, name));
+                    } else {
+                        // Para solicitantes, ir al panel de productos del supermercado
+                        IPanelSwitcher.openPanel(new SupermarketProductsPanel(IPanelSwitcher, currentUserNickname, name, Integer.parseInt(id)));
+                    }
                 }
             });
 
