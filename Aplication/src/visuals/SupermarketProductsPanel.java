@@ -106,11 +106,11 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         JPanel productButtonsPanel = new JPanel(new GridLayout(2, 1, 5, 5));
         productButtonsPanel.setBackground(UITheme.WHITE);
 
-        JButton addToCartButton = new JButton("➕ Añadir al Carrito");
+        JButton addToCartButton = new JButton("Añadir al Carrito");
         UITheme.applyPrimaryButtonStyle(addToCartButton);
         addToCartButton.addActionListener(e -> addSelectedProductsToCart());
 
-        JButton removeFromCartButton = new JButton("➖ Quitar del Carrito");
+        JButton removeFromCartButton = new JButton("Quitar del Carrito");
         UITheme.applySecondaryButtonStyle(removeFromCartButton);
         removeFromCartButton.addActionListener(e -> removeSelectedProductsFromCart());
 
@@ -169,7 +169,7 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         bottomPanel.setBackground(UITheme.WHITE);
 
-        cartButton = new JButton("🛒 Ver Carrito (0)");
+        cartButton = new JButton("Ver Carrito (0)");
         UITheme.applySecondaryButtonStyle(cartButton);
         cartButton.addActionListener(e -> showShoppingList());
 
@@ -335,7 +335,7 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
 
     private void updateCartButton() {
         int totalItems = selectedProducts.values().stream().mapToInt(Integer::intValue).sum();
-        cartButton.setText("🛒 Ver Carrito (" + totalItems + ")");
+        cartButton.setText("Ver Carrito (" + totalItems + ")");
     }
 
     private void showShoppingList() {

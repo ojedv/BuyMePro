@@ -131,13 +131,13 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
         markAsBoughtButton.addActionListener(e -> markAsCompleted());
 
         // Botón ver detalles (acción secundaria)
-        JButton viewDetailsButton = new JButton("👁 Ver Detalles");
+        JButton viewDetailsButton = new JButton("Ver Detalles");
         UITheme.applySecondaryButtonStyle(viewDetailsButton);
         viewDetailsButton.setPreferredSize(new Dimension(150, 40));
         viewDetailsButton.addActionListener(e -> showOrderDetails());
 
         // Botón actualizar (acción secundaria)
-        JButton refreshButton = new JButton("🔄 Actualizar");
+        JButton refreshButton = new JButton("Actualizar");
         UITheme.applySecondaryButtonStyle(refreshButton);
         refreshButton.setPreferredSize(new Dimension(120, 40));
         refreshButton.addActionListener(e -> {

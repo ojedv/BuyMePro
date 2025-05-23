@@ -115,7 +115,7 @@ public class SupermarketSelectionPanel extends JPanel implements IPanelSwitcher 
     }
 
     private JButton createSupermarketButton(String supermarketName, int idSupermercado) {
-        JButton marketButton = new JButton("🏪 " + supermarketName);
+        JButton marketButton = new JButton(supermarketName);
         marketButton.setPreferredSize(new Dimension(200, 80));
 
         // Alternar estilos para variedad visual

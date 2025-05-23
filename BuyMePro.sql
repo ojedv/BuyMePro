@@ -54,7 +54,7 @@ FOREIGN KEY (id_supermercado) REFERENCES supermercado(id_supermercado)
 
 );
 
-REATE TABLE pedido(
+CREATE TABLE pedido(
     id_pedido INT PRIMARY KEY AUTO_INCREMENT,
     id_usuario_solicitante INT NOT NULL,
     id_usuario_comprador INT NULL, -- NULL cuando no hay comprador asignado
