@@ -27,7 +27,8 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
     // Componentes de la interfaz
     private DefaultListModel<String> pendingOrdersModel;
     private JList<String> pendingOrdersList;
-    private List<PedidoInfo> pedidosInfo; // Lista para almacenar información completa de pedidos
+    private List<PedidoInfo> pedidosInfo;
+    private JLabel statsLabel;
 
     // Clase interna para manejar información de pedidos
     private static class PedidoInfo {
@@ -66,67 +67,116 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
 
     private void setupPanel() {
         setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        UITheme.applyPanelStyle(this);
 
-        // Panel superior con título
-        JPanel titlePanel = new JPanel();
-        JLabel titleLabel = new JLabel("Pedidos Pendientes - " + selectedSupermarket, SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titlePanel.add(titleLabel);
-        add(titlePanel, BorderLayout.NORTH);
+        // Panel superior con título estilizado
+        JPanel titlePanel = UITheme.createTitlePanel("Pedidos Pendientes");
 
-        // Panel central - Lista de pedidos pendientes
-        JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.setBorder(BorderFactory.createTitledBorder("Productos solicitados por otros usuarios"));
+        // Subtítulo con información del supermercado
+        JLabel subtitleLabel = new JLabel("Supermercado: " + selectedSupermarket);
+        UITheme.applySubtitleLabelStyle(subtitleLabel);
+        subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        headerPanel.setBackground(UITheme.WHITE);
+        headerPanel.add(titlePanel);
+        headerPanel.add(subtitleLabel);
+        headerPanel.add(Box.createVerticalStrut(10));
+
+        add(headerPanel, BorderLayout.NORTH);
+
+        // Panel central estilizado
+        JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
+        centerPanel.setBackground(UITheme.WHITE);
+        centerPanel.setBorder(UITheme.RED_TITLED_BORDER("Productos solicitados por otros usuarios"));
+
+        // Lista de pedidos con estilo mejorado
         pendingOrdersList = new JList<>(pendingOrdersModel);
         pendingOrdersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        pendingOrdersList.setFont(new Font("Arial", Font.PLAIN, 12));
+        UITheme.applyListStyle(pendingOrdersList);
+
+        // Personalizar el renderer de la lista para mejor presentación
+        pendingOrdersList.setCellRenderer(new PendingOrderCellRenderer());
 
         JScrollPane scrollPane = new JScrollPane(pendingOrdersList);
-        scrollPane.setPreferredSize(new Dimension(600, 300));
+        scrollPane.setPreferredSize(new Dimension(700, 350));
+        scrollPane.setBorder(BorderFactory.createLineBorder(UITheme.LIGHT_GRAY));
+        scrollPane.getViewport().setBackground(UITheme.WHITE);
         centerPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Panel de botones para gestionar pedidos
-        JPanel actionPanel = new JPanel(new FlowLayout());
+        // Panel de botones estilizado
+        JPanel actionPanel = createActionPanel();
+        centerPanel.add(actionPanel, BorderLayout.SOUTH);
 
-        JButton markAsBoughtButton = new JButton("Marcar como Comprado");
-        markAsBoughtButton.setFont(new Font("Arial", Font.BOLD, 14));
-        markAsBoughtButton.setBackground(new Color(76, 175, 80));
-        markAsBoughtButton.setForeground(Color.WHITE);
+        add(centerPanel, BorderLayout.CENTER);
+
+        // Panel inferior con estadísticas y navegación
+        JPanel bottomPanel = createBottomPanel();
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    /**
+     * Crea el panel de acciones con botones estilizados
+     */
+    private JPanel createActionPanel() {
+        JPanel actionPanel = new JPanel();
+        actionPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        actionPanel.setBackground(UITheme.WHITE);
+
+        // Botón marcar como comprado (acción principal)
+        JButton markAsBoughtButton = new JButton("✓ Marcar como Comprado");
+        UITheme.applyPrimaryButtonStyle(markAsBoughtButton);
+        markAsBoughtButton.setPreferredSize(new Dimension(200, 40));
         markAsBoughtButton.addActionListener(e -> markAsCompleted());
 
-        JButton viewDetailsButton = new JButton("Ver Detalles");
-        viewDetailsButton.setFont(new Font("Arial", Font.BOLD, 14));
+        // Botón ver detalles (acción secundaria)
+        JButton viewDetailsButton = new JButton("👁 Ver Detalles");
+        UITheme.applySecondaryButtonStyle(viewDetailsButton);
+        viewDetailsButton.setPreferredSize(new Dimension(150, 40));
         viewDetailsButton.addActionListener(e -> showOrderDetails());
 
-        JButton refreshButton = new JButton("Actualizar Lista");
-        refreshButton.setFont(new Font("Arial", Font.BOLD, 14));
+        // Botón actualizar (acción secundaria)
+        JButton refreshButton = new JButton("🔄 Actualizar");
+        UITheme.applySecondaryButtonStyle(refreshButton);
+        refreshButton.setPreferredSize(new Dimension(120, 40));
         refreshButton.addActionListener(e -> {
             loadPendingOrders();
-            JOptionPane.showMessageDialog(this, "Lista actualizada", "Información",
-                    JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lista actualizada correctamente",
+                    "Información", JOptionPane.INFORMATION_MESSAGE);
         });
 
         actionPanel.add(markAsBoughtButton);
         actionPanel.add(viewDetailsButton);
         actionPanel.add(refreshButton);
 
-        centerPanel.add(actionPanel, BorderLayout.SOUTH);
-        add(centerPanel, BorderLayout.CENTER);
+        return actionPanel;
+    }
 
-        // Panel inferior con estadísticas y navegación
-        JPanel bottomPanel = new JPanel(new BorderLayout());
+    /**
+     * Crea el panel inferior con estadísticas y navegación
+     */
+    private JPanel createBottomPanel() {
+        JPanel bottomPanel = new JPanel(new BorderLayout(10, 10));
+        bottomPanel.setBackground(UITheme.WHITE);
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
 
         // Panel de estadísticas
-        JPanel statsPanel = new JPanel(new FlowLayout());
-        JLabel statsLabel = new JLabel("Total pedidos pendientes: " + pedidosInfo.size());
-        statsLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        statsPanel.setBackground(UITheme.WHITE);
+
+        statsLabel = new JLabel("Total pedidos pendientes: 0");
+        UITheme.applyFormLabelStyle(statsLabel);
+        statsLabel.setForeground(UITheme.PRIMARY_RED);
         statsPanel.add(statsLabel);
 
         // Panel de navegación
-        JPanel navPanel = new JPanel(new FlowLayout());
-        JButton backButton = new JButton("Volver");
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        navPanel.setBackground(UITheme.WHITE);
+
+        JButton backButton = new JButton("← Volver");
+        UITheme.applySecondaryButtonStyle(backButton);
+        backButton.setPreferredSize(new Dimension(100, 35));
         backButton.addActionListener(e ->
                 IPanelSwitcher.openPanel(new SupermarketSelectionPanel(IPanelSwitcher, currentUserNickname, "comprador"))
         );
@@ -134,7 +184,40 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
 
         bottomPanel.add(statsPanel, BorderLayout.WEST);
         bottomPanel.add(navPanel, BorderLayout.EAST);
-        add(bottomPanel, BorderLayout.SOUTH);
+
+        return bottomPanel;
+    }
+
+    /**
+     * Renderer personalizado para los elementos de la lista
+     */
+    private class PendingOrderCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                      boolean isSelected, boolean cellHasFocus) {
+
+            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+            label.setFont(UITheme.REGULAR_FONT);
+            label.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
+
+            if (isSelected) {
+                label.setBackground(UITheme.LIGHT_RED);
+                label.setForeground(UITheme.TEXT_DARK);
+            } else {
+                label.setBackground(UITheme.WHITE);
+                label.setForeground(UITheme.TEXT_DARK);
+            }
+
+            // Añadir icono según el estado
+            if (index < pedidosInfo.size()) {
+                PedidoInfo pedido = pedidosInfo.get(index);
+                String icon = pedido.estado.equals("PENDIENTE") ? "⏳" : "📋";
+                label.setText(icon + " " + value.toString());
+            }
+
+            return label;
+        }
     }
 
     /**
@@ -194,10 +277,7 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
             updateStats();
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                    "Error al cargar pedidos: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            showStyledErrorDialog("Error al cargar pedidos: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -209,23 +289,17 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
         int[] selectedIndices = pendingOrdersList.getSelectedIndices();
 
         if (selectedIndices.length == 0) {
-            JOptionPane.showMessageDialog(this,
-                    "Por favor, seleccione al menos un pedido",
-                    "Información",
-                    JOptionPane.INFORMATION_MESSAGE);
+            showStyledInfoDialog("Por favor, seleccione al menos un pedido");
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Está seguro de marcar como comprados los productos seleccionados?",
-                "Confirmar",
-                JOptionPane.YES_NO_OPTION);
+        int confirm = showStyledConfirmDialog(
+                "¿Está seguro de marcar como comprados los productos seleccionados?");
 
         if (confirm == JOptionPane.YES_OPTION) {
             try (Connection connection = ConexionBD.getConnection()) {
                 connection.setAutoCommit(false);
 
-                // Obtener el ID del usuario comprador actual
                 int compradorId = getCurrentUserId(connection);
 
                 String updateSql = """
@@ -249,12 +323,7 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
                     ps.executeBatch();
                     connection.commit();
 
-                    JOptionPane.showMessageDialog(this,
-                            "Pedidos marcados como completados",
-                            "Éxito",
-                            JOptionPane.INFORMATION_MESSAGE);
-
-                    // Recargar la lista
+                    showStyledSuccessDialog("Pedidos marcados como completados exitosamente");
                     loadPendingOrders();
 
                 } catch (SQLException e) {
@@ -263,10 +332,7 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
                 }
 
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this,
-                        "Error al actualizar pedidos: " + e.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                showStyledErrorDialog("Error al actualizar pedidos: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -294,27 +360,44 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
         int selectedIndex = pendingOrdersList.getSelectedIndex();
 
         if (selectedIndex == -1) {
-            JOptionPane.showMessageDialog(this,
-                    "Por favor, seleccione un pedido",
-                    "Información",
-                    JOptionPane.INFORMATION_MESSAGE);
+            showStyledInfoDialog("Por favor, seleccione un pedido");
             return;
         }
 
         if (selectedIndex < pedidosInfo.size()) {
             PedidoInfo pedido = pedidosInfo.get(selectedIndex);
 
-            StringBuilder details = new StringBuilder();
-            details.append("Detalles del Pedido #").append(pedido.idPedido).append("\n\n");
-            details.append("Usuario Solicitante: ").append(pedido.nicknameUsuario).append("\n");
-            details.append("Producto: ").append(pedido.nombreProducto).append("\n");
-            details.append("Precio: €").append(String.format("%.2f", pedido.precio)).append("\n");
-            details.append("Estado: ").append(pedido.estado).append("\n");
-            details.append("Supermercado: ").append(selectedSupermarket);
+            // Crear un panel personalizado para mostrar los detalles
+            JPanel detailsPanel = new JPanel();
+            detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
+            detailsPanel.setBackground(UITheme.WHITE);
+            detailsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-            JOptionPane.showMessageDialog(this,
-                    details.toString(),
-                    "Detalles del Pedido",
+            // Título del pedido
+            JLabel titleLabel = new JLabel("Detalles del Pedido #" + pedido.idPedido);
+            UITheme.applySubtitleLabelStyle(titleLabel);
+            titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            detailsPanel.add(titleLabel);
+            detailsPanel.add(Box.createVerticalStrut(15));
+
+            // Información del pedido
+            String[] details = {
+                    "Usuario Solicitante: " + pedido.nicknameUsuario,
+                    "Producto: " + pedido.nombreProducto,
+                    "Precio: €" + String.format("%.2f", pedido.precio),
+                    "Estado: " + pedido.estado,
+                    "Supermercado: " + selectedSupermarket
+            };
+
+            for (String detail : details) {
+                JLabel detailLabel = new JLabel(detail);
+                UITheme.applyFormLabelStyle(detailLabel);
+                detailLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                detailsPanel.add(detailLabel);
+                detailsPanel.add(Box.createVerticalStrut(5));
+            }
+
+            JOptionPane.showMessageDialog(this, detailsPanel, "Detalles del Pedido",
                     JOptionPane.INFORMATION_MESSAGE);
         }
     }
@@ -323,19 +406,26 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
      * Actualiza las estadísticas mostradas
      */
     private void updateStats() {
-        Component[] components = ((JPanel) getComponent(2)).getComponents(); // bottomPanel
-        for (Component comp : components) {
-            if (comp instanceof JPanel) {
-                JPanel panel = (JPanel) comp;
-                for (Component subComp : panel.getComponents()) {
-                    if (subComp instanceof JLabel &&
-                            ((JLabel) subComp).getText().contains("Total pedidos")) {
-                        ((JLabel) subComp).setText("Total pedidos pendientes: " + pedidosInfo.size());
-                        break;
-                    }
-                }
-            }
+        if (statsLabel != null) {
+            statsLabel.setText("Total pedidos pendientes: " + pedidosInfo.size());
         }
+    }
+
+    // Métodos para diálogos estilizados
+    private void showStyledInfoDialog(String message) {
+        JOptionPane.showMessageDialog(this, message, "Información", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void showStyledErrorDialog(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showStyledSuccessDialog(String message) {
+        JOptionPane.showMessageDialog(this, message, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private int showStyledConfirmDialog(String message) {
+        return JOptionPane.showConfirmDialog(this, message, "Confirmar", JOptionPane.YES_NO_OPTION);
     }
 
     @Override

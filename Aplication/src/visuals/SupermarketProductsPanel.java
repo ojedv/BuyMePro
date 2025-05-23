@@ -3,8 +3,6 @@ package visuals;
 import GestionBBDD.AddBBDD;
 import GestionBBDD.ConexionBD;
 import Objetos.Producto;
-import Objetos.Pedido;
-import Objetos.PedidoProducto;
 import interfaces.IPanelSwitcher;
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Panel para mostrar y gestionar productos de un supermercado específico
+ * Panel para mostrar y gestionar productos de un supermercado específico - Versión mejorada
  */
 public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
     private IPanelSwitcher IPanelSwitcher;
@@ -32,8 +30,8 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
     // Componentes de la interfaz
     private DefaultListModel<String> productListModel;
     private JList<String> productList;
-    private List<Producto> productos; // Lista para almacenar los productos completos
-    private Map<Producto, Integer> selectedProducts; // Mapa de productos seleccionados y cantidades
+    private List<Producto> productos;
+    private Map<Producto, Integer> selectedProducts;
 
     // Componentes para añadir productos
     private JTextField nombreField;
@@ -55,10 +53,7 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         this.productos = new ArrayList<>();
         this.selectedProducts = new HashMap<>();
 
-        // Obtener ID del usuario
         this.idUsuario = getUserId(userNickname);
-
-        // Inicializar conexión a base de datos
         this.conexionBD = new ConexionBD();
         this.addBBDD = new AddBBDD(conexionBD);
 
@@ -82,38 +77,41 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
     }
 
     private void setupPanel() {
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout(15, 15));
+        setBackground(UITheme.WHITE);
+        setBorder(UITheme.EMPTY_BORDER);
 
         // Panel superior con título
-        JPanel titlePanel = new JPanel();
-        JLabel titleLabel = new JLabel("Productos de " + selectedSupermarket, SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titlePanel.add(titleLabel);
+        JPanel titlePanel = UITheme.createTitlePanel("Productos de " + selectedSupermarket);
         add(titlePanel, BorderLayout.NORTH);
 
-        // Panel central dividido en dos partes
-        JPanel centerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        // Panel central dividido
+        JPanel centerPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+        centerPanel.setBackground(UITheme.WHITE);
 
         // Panel izquierdo - Lista de productos
-        JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.setBorder(BorderFactory.createTitledBorder("Productos Disponibles"));
+        JPanel leftPanel = new JPanel(new BorderLayout(10, 10));
+        leftPanel.setBackground(UITheme.WHITE);
+        leftPanel.setBorder(UITheme.RED_TITLED_BORDER("Productos Disponibles"));
 
         productList = new JList<>(productListModel);
         productList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        UITheme.applyListStyle(productList);
+
         JScrollPane scrollPane = new JScrollPane(productList);
-        scrollPane.setPreferredSize(new Dimension(300, 300));
+        scrollPane.setPreferredSize(new Dimension(300, 350));
         leftPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Panel para botones de gestión de productos
+        // Panel de botones para productos
         JPanel productButtonsPanel = new JPanel(new GridLayout(2, 1, 5, 5));
+        productButtonsPanel.setBackground(UITheme.WHITE);
 
-        JButton addToCartButton = new JButton("Añadir al Carrito");
-        addToCartButton.setFont(new Font("Arial", Font.BOLD, 12));
+        JButton addToCartButton = new JButton("➕ Añadir al Carrito");
+        UITheme.applyPrimaryButtonStyle(addToCartButton);
         addToCartButton.addActionListener(e -> addSelectedProductsToCart());
 
-        JButton removeFromCartButton = new JButton("Quitar del Carrito");
-        removeFromCartButton.setFont(new Font("Arial", Font.BOLD, 12));
+        JButton removeFromCartButton = new JButton("➖ Quitar del Carrito");
+        UITheme.applySecondaryButtonStyle(removeFromCartButton);
         removeFromCartButton.addActionListener(e -> removeSelectedProductsFromCart());
 
         productButtonsPanel.add(addToCartButton);
@@ -123,54 +121,69 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         centerPanel.add(leftPanel);
 
         // Panel derecho - Añadir nuevo producto
-        JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.setBorder(BorderFactory.createTitledBorder("Añadir Nuevo Producto"));
+        JPanel rightPanel = new JPanel(new BorderLayout(10, 10));
+        rightPanel.setBackground(UITheme.WHITE);
+        rightPanel.setBorder(UITheme.RED_TITLED_BORDER("Añadir Nuevo Producto"));
 
-        // Formulario para añadir producto
+        // Formulario
         JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(UITheme.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
 
         // Campo nombre
         gbc.gridx = 0; gbc.gridy = 0;
-        formPanel.add(new JLabel("Nombre:"), gbc);
+        JLabel nameLabel = new JLabel("Nombre:");
+        UITheme.applyFormLabelStyle(nameLabel);
+        formPanel.add(nameLabel, gbc);
+
         gbc.gridx = 1;
         nombreField = new JTextField(15);
+        UITheme.applyTextFieldStyle(nombreField);
         formPanel.add(nombreField, gbc);
 
         // Campo precio
         gbc.gridx = 0; gbc.gridy = 1;
-        formPanel.add(new JLabel("Precio:"), gbc);
+        JLabel priceLabel = new JLabel("Precio (€):");
+        UITheme.applyFormLabelStyle(priceLabel);
+        formPanel.add(priceLabel, gbc);
+
         gbc.gridx = 1;
         precioField = new JTextField(15);
+        UITheme.applyTextFieldStyle(precioField);
         formPanel.add(precioField, gbc);
 
         rightPanel.add(formPanel, BorderLayout.CENTER);
 
-        // Botón para añadir producto
+        // Botón añadir producto
         JButton addProductButton = new JButton("Añadir Producto");
-        addProductButton.setFont(new Font("Arial", Font.BOLD, 14));
+        UITheme.applyPrimaryButtonStyle(addProductButton);
         addProductButton.addActionListener(e -> addNewProduct());
         rightPanel.add(addProductButton, BorderLayout.SOUTH);
 
         centerPanel.add(rightPanel);
         add(centerPanel, BorderLayout.CENTER);
 
-        // Panel inferior con botones de navegación
-        JPanel bottomPanel = new JPanel(new FlowLayout());
+        // Panel inferior con botones principales
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        bottomPanel.setBackground(UITheme.WHITE);
 
-        cartButton = new JButton("Ver Carrito (0)");
-        cartButton.setFont(new Font("Arial", Font.BOLD, 14));
+        cartButton = new JButton("🛒 Ver Carrito (0)");
+        UITheme.applySecondaryButtonStyle(cartButton);
         cartButton.addActionListener(e -> showShoppingList());
 
         JButton orderButton = new JButton("ENCARGAR PEDIDO");
-        orderButton.setFont(new Font("Arial", Font.BOLD, 16));
+        orderButton.setPreferredSize(new Dimension(200, 40));
         orderButton.setBackground(new Color(0, 150, 0));
         orderButton.setForeground(Color.WHITE);
+        orderButton.setFont(UITheme.BUTTON_FONT);
+        orderButton.setFocusPainted(false);
+        orderButton.setBorderPainted(false);
         orderButton.addActionListener(e -> createOrder());
 
-        JButton backButton = new JButton("Volver");
+        JButton backButton = new JButton("← Volver");
+        UITheme.applySecondaryButtonStyle(backButton);
         backButton.addActionListener(e ->
                 IPanelSwitcher.openPanel(new SupermarketSelectionPanel(IPanelSwitcher, currentUserNickname, "solicitante"))
         );
@@ -181,9 +194,6 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    /**
-     * Carga los productos del supermercado desde la base de datos
-     */
     private void loadProducts() {
         productListModel.clear();
         productos.clear();
@@ -220,9 +230,6 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         }
     }
 
-    /**
-     * Añade un nuevo producto a la base de datos
-     */
     private void addNewProduct() {
         String nombre = nombreField.getText().trim();
         String precioText = precioField.getText().trim();
@@ -251,7 +258,7 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
 
             if (success) {
                 JOptionPane.showMessageDialog(this,
-                        "Producto añadido correctamente",
+                        "✅ Producto añadido correctamente",
                         "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
                 nombreField.setText("");
@@ -259,7 +266,7 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
                 loadProducts();
             } else {
                 JOptionPane.showMessageDialog(this,
-                        "Error al añadir el producto",
+                        "❌ Error al añadir el producto",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -272,9 +279,6 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         }
     }
 
-    /**
-     * Añade los productos seleccionados al carrito
-     */
     private void addSelectedProductsToCart() {
         int[] selectedIndices = productList.getSelectedIndices();
 
@@ -294,16 +298,13 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         }
 
         JOptionPane.showMessageDialog(this,
-                "Productos añadidos al carrito",
+                "✅ Productos añadidos al carrito",
                 "Éxito",
                 JOptionPane.INFORMATION_MESSAGE);
 
         updateCartButton();
     }
 
-    /**
-     * Quita los productos seleccionados del carrito
-     */
     private void removeSelectedProductsFromCart() {
         int[] selectedIndices = productList.getSelectedIndices();
 
@@ -332,17 +333,11 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         updateCartButton();
     }
 
-    /**
-     * Actualiza el botón del carrito con el número de productos
-     */
     private void updateCartButton() {
         int totalItems = selectedProducts.values().stream().mapToInt(Integer::intValue).sum();
-        cartButton.setText("Ver Carrito (" + totalItems + ")");
+        cartButton.setText("🛒 Ver Carrito (" + totalItems + ")");
     }
 
-    /**
-     * Muestra la lista de compra
-     */
     private void showShoppingList() {
         if (selectedProducts.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -353,7 +348,8 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Carrito de Compras:\n\n");
+        sb.append("CARRITO DE COMPRAS\n");
+        sb.append("══════════════════════\n\n");
         double total = 0;
 
         for (Map.Entry<Producto, Integer> entry : selectedProducts.entrySet()) {
@@ -369,7 +365,8 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
             total += subtotal;
         }
 
-        sb.append("\nTotal: €").append(String.format("%.2f", total));
+        sb.append("\n══════════════════════");
+        sb.append("\nTOTAL: €").append(String.format("%.2f", total));
 
         JOptionPane.showMessageDialog(this,
                 sb.toString(),
@@ -377,9 +374,6 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /**
-     * Crea un pedido con los productos seleccionados
-     */
     private void createOrder() {
         if (selectedProducts.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -438,7 +432,7 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
             connection.commit();
 
             JOptionPane.showMessageDialog(this,
-                    "¡Pedido creado exitosamente!\n" +
+                    "🎉 ¡PEDIDO CREADO EXITOSAMENTE!\n\n" +
                             "ID del pedido: " + idPedido + "\n" +
                             "Total: €" + String.format("%.2f", total) + "\n" +
                             "Estado: PENDIENTE\n\n" +
@@ -452,7 +446,7 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
-                    "Error al crear el pedido: " + e.getMessage(),
+                    "❌ Error al crear el pedido: " + e.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();

@@ -7,96 +7,82 @@ import java.awt.event.ActionListener;
 import interfaces.IPanelSwitcher;
 
 /**
- * Panel para la selección de rol del usuario
+ * Panel para la selección de rol del usuario - Versión mejorada
  */
 public class RoleSelectionPanel extends JPanel implements IPanelSwitcher {
-    // Referencia al gestor de paneles
     private IPanelSwitcher IPanelSwitcher;
-
-    // Almacenar el nickname del usuario actual
     private String currentUserNickname;
 
-    /**
-     * Constructor del panel de selección de rol
-     * @param IPanelSwitcher Gestor para cambiar entre paneles
-     * @param userNickname Nickname del usuario actual
-     */
     public RoleSelectionPanel(IPanelSwitcher IPanelSwitcher, String userNickname) {
         this.IPanelSwitcher = IPanelSwitcher;
         this.currentUserNickname = userNickname;
         setupPanel();
     }
 
-    /**
-     * Configura los componentes del panel
-     */
     private void setupPanel() {
-        // Usar BorderLayout como layout principal
-        setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+        // Configuración del panel principal
+        setLayout(new BorderLayout());
+        setBackground(UITheme.WHITE);
+        setBorder(BorderFactory.createEmptyBorder(40, 50, 40, 50));
 
-        // Panel de título
-        JPanel titlePanel = new JPanel();
+        // Panel central con disposición vertical
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBackground(UITheme.WHITE);
+
+        // Título principal
         JLabel titleLabel = new JLabel("Selección de Rol");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titlePanel.add(titleLabel);
+        UITheme.applyTitleLabelStyle(titleLabel);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(titleLabel);
+        centerPanel.add(Box.createVerticalStrut(15));
 
-        // Panel de información
-        JPanel infoPanel = new JPanel();
-        JLabel infoLabel = new JLabel("¿Qué deseas hacer hoy?");
-        infoLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        infoPanel.add(infoLabel);
+        // Subtítulo
+        JLabel subtitleLabel = new JLabel("¡Hola " + currentUserNickname + "! ¿Qué deseas hacer hoy?");
+        UITheme.applySubtitleLabelStyle(subtitleLabel);
+        subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(subtitleLabel);
+        centerPanel.add(Box.createVerticalStrut(40));
 
         // Panel para los botones de rol
-        JPanel roleButtonsPanel = new JPanel(new GridLayout(2, 1, 0, 20));
-        roleButtonsPanel.setBorder(BorderFactory.createEmptyBorder(30, 100, 30, 100));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(2, 1, 0, 20));
+        buttonPanel.setBackground(UITheme.WHITE);
+        buttonPanel.setMaximumSize(new Dimension(350, 120));
+        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Botón de ir a comprar
-        JButton goShoppingButton = new JButton("Ir a comprar");
-        goShoppingButton.setFont(new Font("Arial", Font.BOLD, 16));
-        goShoppingButton.setPreferredSize(new Dimension(200, 60));
-        goShoppingButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Navegar al panel de selección de supermercados para comprar
-                IPanelSwitcher.openPanel(new SupermarketSelectionPanel(IPanelSwitcher, currentUserNickname, "comprador"));
-            }
-        });
+        JButton goShoppingButton = new JButton("Ir a Comprar");
+        goShoppingButton.setPreferredSize(new Dimension(350, 50));
+        UITheme.applyPrimaryButtonStyle(goShoppingButton);
+        goShoppingButton.addActionListener(e ->
+                IPanelSwitcher.openPanel(new SupermarketSelectionPanel(IPanelSwitcher, currentUserNickname, "comprador"))
+        );
 
-        // Botón de que te vayan a comprar
-        JButton getNeedShoppingButton = new JButton("Necesito que me compren");
-        getNeedShoppingButton.setFont(new Font("Arial", Font.BOLD, 16));
-        getNeedShoppingButton.setPreferredSize(new Dimension(200, 60));
-        getNeedShoppingButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Navegar al panel de selección de supermercados para solicitar compras
-                IPanelSwitcher.openPanel(new SupermarketSelectionPanel(IPanelSwitcher, currentUserNickname, "solicitante"));
-            }
-        });
+        // Botón de solicitar compras
+        JButton getNeedShoppingButton = new JButton("Necesito que me Compren");
+        getNeedShoppingButton.setPreferredSize(new Dimension(350, 50));
+        UITheme.applySecondaryButtonStyle(getNeedShoppingButton);
+        getNeedShoppingButton.addActionListener(e ->
+                IPanelSwitcher.openPanel(new SupermarketSelectionPanel(IPanelSwitcher, currentUserNickname, "solicitante"))
+        );
 
-        // Añadir botones al panel de roles
-        roleButtonsPanel.add(goShoppingButton);
-        roleButtonsPanel.add(getNeedShoppingButton);
+        buttonPanel.add(goShoppingButton);
+        buttonPanel.add(getNeedShoppingButton);
+        centerPanel.add(buttonPanel);
+        centerPanel.add(Box.createVerticalStrut(40));
 
-        // Panel para el botón de volver
-        JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton backButton = new JButton("Volver");
-        backButton.setPreferredSize(new Dimension(120, 40));
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Volver al panel de bienvenida
-                IPanelSwitcher.openPanel(new WelcomeIPanel(IPanelSwitcher));
-            }
-        });
-        backButtonPanel.add(backButton);
+        // Botón volver
+        JButton backButton = new JButton("← Volver");
+        backButton.setPreferredSize(new Dimension(120, 35));
+        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        UITheme.applySecondaryButtonStyle(backButton);
+        backButton.addActionListener(e ->
+                IPanelSwitcher.openPanel(new WelcomeIPanel(IPanelSwitcher))
+        );
+        centerPanel.add(backButton);
 
-        // Añadir paneles al contenedor principal
-        add(titlePanel, BorderLayout.NORTH);
-        add(infoPanel, BorderLayout.CENTER);
-        add(roleButtonsPanel, BorderLayout.CENTER);
-        add(backButtonPanel, BorderLayout.SOUTH);
+        add(centerPanel, BorderLayout.CENTER);
     }
 
     @Override

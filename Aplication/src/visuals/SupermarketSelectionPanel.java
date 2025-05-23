@@ -10,26 +10,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Panel para la selección de supermercado
+ * Panel para la selección de supermercado - Versión mejorada
  */
 public class SupermarketSelectionPanel extends JPanel implements IPanelSwitcher {
-    // Referencia al gestor de paneles
     private IPanelSwitcher IPanelSwitcher;
-
-    // Datos del usuario
     private String currentUserNickname;
     private String userRole;
 
-    /**
-     * Constructor del panel de selección de supermercado
-     * @param IPanelSwitcher Gestor para cambiar entre paneles
-     * @param userNickname Nickname del usuario actual
-     * @param role Rol seleccionado (comprador o solicitante)
-     */
     public SupermarketSelectionPanel(IPanelSwitcher IPanelSwitcher, String userNickname, String role) {
         this.IPanelSwitcher = IPanelSwitcher;
         this.currentUserNickname = userNickname;
@@ -37,64 +26,59 @@ public class SupermarketSelectionPanel extends JPanel implements IPanelSwitcher 
         setupPanel();
     }
 
-    /**
-     * Configura los componentes del panel
-     */
     private void setupPanel() {
-        // Usar BorderLayout como layout principal
-        setLayout(new BorderLayout(20, 20));
+        // Configuración del panel principal
+        setLayout(new BorderLayout());
+        setBackground(UITheme.WHITE);
         setBorder(BorderFactory.createEmptyBorder(40, 50, 40, 50));
 
-        // Panel superior combinado (título + información)
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        // Panel central con disposición vertical
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBackground(UITheme.WHITE);
 
-        // Título
+        // Título principal
         JLabel titleLabel = new JLabel("Selección de Supermercado");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        UITheme.applyTitleLabelStyle(titleLabel);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(titleLabel);
+        centerPanel.add(Box.createVerticalStrut(15));
 
-        // Información
+        // Subtítulo dinámico según el rol
         String infoText = userRole.equals("comprador") ?
                 "Selecciona el supermercado donde quieres realizar la compra:" :
                 "Selecciona el supermercado para tu lista de compras:";
-        JLabel infoLabel = new JLabel(infoText);
-        infoLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        infoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        topPanel.add(titleLabel);
-        topPanel.add(Box.createVerticalStrut(15));
-        topPanel.add(infoLabel);
+        JLabel subtitleLabel = new JLabel(infoText);
+        UITheme.applySubtitleLabelStyle(subtitleLabel);
+        subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(subtitleLabel);
+        centerPanel.add(Box.createVerticalStrut(40));
 
         // Panel para los botones de supermercado
-        JPanel supermarketButtonsPanel = new JPanel(new GridLayout(2, 2, 20, 20));
-        supermarketButtonsPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        JPanel supermarketPanel = new JPanel(new GridLayout(2, 2, 15, 15));
+        supermarketPanel.setBackground(UITheme.WHITE);
+        supermarketPanel.setMaximumSize(new Dimension(500, 200));
+        supermarketPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Cargar supermercados desde la base de datos
-        loadSupermarkets(supermarketButtonsPanel);
+        // Cargar supermercados
+        loadSupermarkets(supermarketPanel);
 
-        // Panel para el botón de volver
-        JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton backButton = new JButton("Volver");
-        backButton.setPreferredSize(new Dimension(120, 40));
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Volver al panel de selección de rol
-                IPanelSwitcher.openPanel(new RoleSelectionPanel(IPanelSwitcher, currentUserNickname));
-            }
-        });
-        backButtonPanel.add(backButton);
+        centerPanel.add(supermarketPanel);
+        centerPanel.add(Box.createVerticalStrut(40));
 
-        // Añadir paneles al contenedor principal
-        add(topPanel, BorderLayout.NORTH);
-        add(supermarketButtonsPanel, BorderLayout.CENTER);
-        add(backButtonPanel, BorderLayout.SOUTH);
+        // Botón volver
+        JButton backButton = new JButton("← Volver");
+        backButton.setPreferredSize(new Dimension(120, 35));
+        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        UITheme.applySecondaryButtonStyle(backButton);
+        backButton.addActionListener(e ->
+                IPanelSwitcher.openPanel(new RoleSelectionPanel(IPanelSwitcher, currentUserNickname))
+        );
+        centerPanel.add(backButton);
+
+        add(centerPanel, BorderLayout.CENTER);
     }
 
-    /**
-     * Carga los supermercados desde la base de datos y crea los botones
-     */
     private void loadSupermarkets(JPanel panel) {
         boolean loadedFromDatabase = false;
 
@@ -106,24 +90,7 @@ public class SupermarketSelectionPanel extends JPanel implements IPanelSwitcher 
                 int idSupermercado = rs.getInt("id_supermercado");
                 String nombreSupermercado = rs.getString("nombre");
 
-                JButton marketButton = new JButton(nombreSupermercado);
-                marketButton.setFont(new Font("Arial", Font.BOLD, 16));
-                marketButton.setPreferredSize(new Dimension(150, 100));
-
-                // Configurar el ActionListener para cada botón
-                marketButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (userRole.equals("comprador")) {
-                            // Para compradores, ir al panel de actualización de productos
-                            IPanelSwitcher.openPanel(new UpdateProductsPanel(IPanelSwitcher, currentUserNickname, nombreSupermercado , idSupermercado));
-                        } else {
-                            // Para solicitantes, ir al panel de gestión de productos del supermercado
-                            IPanelSwitcher.openPanel(new SupermarketProductsPanel(IPanelSwitcher, currentUserNickname, nombreSupermercado, idSupermercado));
-                        }
-                    }
-                });
-
+                JButton marketButton = createSupermarketButton(nombreSupermercado, idSupermercado);
                 panel.add(marketButton);
                 loadedFromDatabase = true;
             }
@@ -137,27 +104,36 @@ public class SupermarketSelectionPanel extends JPanel implements IPanelSwitcher 
             String[] defaultSupermarkets = {"Mercadona", "Lidl", "Dia", "Mas"};
             for (int i = 0; i < defaultSupermarkets.length; i++) {
                 String supermarket = defaultSupermarkets[i];
-                int idSupermercado = i + 1; // IDs por defecto
-
-                JButton marketButton = new JButton(supermarket);
-                marketButton.setFont(new Font("Arial", Font.BOLD, 16));
-                marketButton.setPreferredSize(new Dimension(150, 100));
-
-                marketButton.addActionListener(event -> {
-                    if (userRole.equals("comprador")) {
-                        IPanelSwitcher.openPanel(new UpdateProductsPanel(IPanelSwitcher, currentUserNickname, supermarket, idSupermercado));
-                    } else {
-                        IPanelSwitcher.openPanel(new SupermarketProductsPanel(IPanelSwitcher, currentUserNickname, supermarket, idSupermercado));
-                    }
-                });
-
+                int idSupermercado = i + 1;
+                JButton marketButton = createSupermarketButton(supermarket, idSupermercado);
                 panel.add(marketButton);
             }
         }
 
-        // Forzar actualización del panel
         panel.revalidate();
         panel.repaint();
+    }
+
+    private JButton createSupermarketButton(String supermarketName, int idSupermercado) {
+        JButton marketButton = new JButton("🏪 " + supermarketName);
+        marketButton.setPreferredSize(new Dimension(200, 80));
+
+        // Alternar estilos para variedad visual
+        if (supermarketName.equals("Mercadona") || supermarketName.equals("Dia")) {
+            UITheme.applyPrimaryButtonStyle(marketButton);
+        } else {
+            UITheme.applySecondaryButtonStyle(marketButton);
+        }
+
+        marketButton.addActionListener(e -> {
+            if (userRole.equals("comprador")) {
+                IPanelSwitcher.openPanel(new UpdateProductsPanel(IPanelSwitcher, currentUserNickname, supermarketName, idSupermercado));
+            } else {
+                IPanelSwitcher.openPanel(new SupermarketProductsPanel(IPanelSwitcher, currentUserNickname, supermarketName, idSupermercado));
+            }
+        });
+
+        return marketButton;
     }
 
     @Override
