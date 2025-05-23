@@ -54,6 +54,31 @@ FOREIGN KEY (id_supermercado) REFERENCES supermercado(id_supermercado)
 
 );
 
+REATE TABLE pedido(
+    id_pedido INT PRIMARY KEY AUTO_INCREMENT,
+    id_usuario_solicitante INT NOT NULL,
+    id_usuario_comprador INT NULL, -- NULL cuando no hay comprador asignado
+    id_supermercado INT NOT NULL,
+    estado ENUM('PENDIENTE', 'ASIGNADO', 'COMPLETADO', 'CANCELADO') DEFAULT 'PENDIENTE',
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_asignacion TIMESTAMP NULL,
+    fecha_completado TIMESTAMP NULL,
+    total DECIMAL(10,2) DEFAULT 0.00,
+    FOREIGN KEY (id_usuario_solicitante) REFERENCES usuario(id_usuario),
+    FOREIGN KEY (id_usuario_comprador) REFERENCES usuario(id_usuario),
+    FOREIGN KEY (id_supermercado) REFERENCES supermercado(id_supermercado)
+);
+
+CREATE TABLE pedido_producto(
+    id_pedido_producto INT PRIMARY KEY AUTO_INCREMENT,
+    id_pedido INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad INT DEFAULT 1,
+    precio_unitario DECIMAL(10,2),
+    FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido) ON DELETE CASCADE,
+    FOREIGN KEY (id_producto) REFERENCES producto(id_producto)
+);
+
 -- Insertar supermercados
 INSERT INTO supermercado (nombre) 
 VALUES 
@@ -110,3 +135,4 @@ INSERT INTO producto (nombre, precio, id_supermercado) VALUES
 SELECT * FROM usuario;
 SELECT * FROM producto;
 SELECT * FROM supermercado;
+SELECT * FROM pedido_producto;

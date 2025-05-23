@@ -82,7 +82,7 @@ public class AddBBDD {
         try (Connection conexion = conexionBD.getConnection();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
 
-            ps.setInt(1, pedido.getIdUsuario());
+            ps.setInt(1, pedido.getIdUsuarioComprador());
 
             int filasInsertadas = ps.executeUpdate();
             return filasInsertadas > 0;
