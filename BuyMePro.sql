@@ -3,52 +3,47 @@ CREATE DATABASE BuyMeProyect;
 USE BuyMeProyect;
 
 CREATE TABLE usuario(
-id_usuario INT PRIMARY KEY AUTO_INCREMENT, -- HE PUESTO ID_USUARIO POR SI ALGUNA PERSONA NO TIENE DNI 
-nickname VARCHAR(25), -- USUARIO Y CONTRASEÑA NOS SIRVEN PARA IDENTIFICAR A CADA PERSONA, A LA HORA DE INICIAR SESION SOLO SERAN REQUERIDOS ESTOS DOS PARAMETROS
-contraseña VARCHAR(64),
-nombre VARCHAR(20), -- DATOS DE REGISTRO, ESTOS DATOS NOS SIRVEN PARA TENER UN CONTROL SOBRE LAS PERSONAS QUE SE ALOJAN EN NUESTRA APP
-apellidos VARCHAR(35),
-telefono VARCHAR(15), -- ESTO NOS FACILITARA A LA HORA DE HACER LOS "RECADOS" EN CONTACTAR CON LA PERSONA CORRESPONDIENTE
-correo VARCHAR(30) -- PODEMOS ACTUALIZAR A LOS USUARIOS DE LAS ACTUALIZACIONES, Y NOVEDADES DE NUESTRA APLICACION
-
+    id_usuario INT PRIMARY KEY AUTO_INCREMENT,
+    nickname VARCHAR(25),
+    contraseña VARCHAR(64),
+    nombre VARCHAR(20),
+    apellidos VARCHAR(35),
+    telefono VARCHAR(15),
+    correo VARCHAR(30)
 );
 
 CREATE TABLE supermercado(
-id_supermercado INT PRIMARY KEY AUTO_INCREMENT, -- CADA SUPERMERCADO TENDRA SUS PROPIOS PRODUCTOS
-nombre VARCHAR (30)
-
+    id_supermercado INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(30)
 );
 
 CREATE TABLE grupo(
-id_grupo INT PRIMARY KEY AUTO_INCREMENT,
-nombre VARCHAR (30)
-
+    id_grupo INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(30)
 );
 
-CREATE TABLE usuario_grupo ( -- ESTA TABLA NOS PERMITE CONTROLAR LA RELACION ENTRE USUARIO Y GRUPO
-  id_usuario INT,
-  id_grupo INT,
-  PRIMARY KEY (id_usuario, id_grupo),
-  FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
-  FOREIGN KEY (id_grupo) REFERENCES grupo(id_grupo)
+CREATE TABLE usuario_grupo (
+    id_usuario INT,
+    id_grupo INT,
+    PRIMARY KEY (id_usuario, id_grupo),
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
+    FOREIGN KEY (id_grupo) REFERENCES grupo(id_grupo)
 );
 
-CREATE TABLE grupo_supermercado ( -- ESTA TABLA NOS PERMITE CONTROLAR LA RELACION ENTRE SUPERMERCADO Y GRUPO
-  id_grupo INT,
-  id_supermercado INT,
-  PRIMARY KEY (id_grupo, id_supermercado),
-  FOREIGN KEY (id_grupo) REFERENCES grupo(id_grupo),
-  FOREIGN KEY (id_supermercado) REFERENCES supermercado(id_supermercado)
+CREATE TABLE grupo_supermercado (
+    id_grupo INT,
+    id_supermercado INT,
+    PRIMARY KEY (id_grupo, id_supermercado),
+    FOREIGN KEY (id_grupo) REFERENCES grupo(id_grupo),
+    FOREIGN KEY (id_supermercado) REFERENCES supermercado(id_supermercado)
 );
-
 
 CREATE TABLE producto(
-id_producto INT PRIMARY KEY AUTO_INCREMENT,
-nombre VARCHAR (30),
-precio FLOAT -- PONEMOS EL PRECIO PARA QUE APAREZCA AL SELECCIONAR EL PRODUCTO
-
-
-
+    id_producto INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(30),
+    precio FLOAT,
+    id_supermercado INT,
+    FOREIGN KEY (id_supermercado) REFERENCES supermercado(id_supermercado)
 );
 
 CREATE TABLE producto_supermercado (
@@ -59,13 +54,13 @@ FOREIGN KEY (id_supermercado) REFERENCES supermercado(id_supermercado)
 
 );
 
+-- Insertar supermercados
 INSERT INTO supermercado (nombre) 
 VALUES 
 ('Mercadona'),
 ('Lidl'),
 ('Más'),
 ('Dia');
-
 
 -- Insertar productos para Mercadona (id_supermercado = 1)
 INSERT INTO producto (nombre, precio, id_supermercado) VALUES 
@@ -111,13 +106,7 @@ INSERT INTO producto (nombre, precio, id_supermercado) VALUES
 ('Manzanas 1.5kg', 2.90, 4),
 ('Papel Higiénico Pack 6', 4.50, 4);
 
-
-
-
-
+-- Consultas de comprobación
 SELECT * FROM usuario;
 SELECT * FROM producto;
 SELECT * FROM supermercado;
-
-
-

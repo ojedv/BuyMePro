@@ -166,7 +166,7 @@ public class LoginIPanel extends JPanel implements IPanelSwitcher {
         add(centerPanel, BorderLayout.CENTER);
     }
     public boolean validarLogin(String nickname, char[] password) {
-        String query = "SELECT contraseña FROM usuario WHERE nickname = ?"; // Cambia "usuarios" por el nombre de tu tabla si es diferente.
+        String query = "SELECT contraseña FROM usuario WHERE nickname = ?";
 
         try (Connection connection = ConexionBD.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -176,9 +176,24 @@ public class LoginIPanel extends JPanel implements IPanelSwitcher {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     String passwordBD = resultSet.getString("contraseña");
-                    return passwordBD.equals(new String(password)); // Comparación con conversión de char[] a String
+                    if (!passwordBD.equals(new String(password))) {
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "La contraseña ingresada es incorrecta",
+                                "Error de autenticación",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return false;
+                    }
+                    return true;
                 } else {
-                    return false; // El nickname no existe en la base de datos
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "El usuario no existe",
+                            "Error de autenticación",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    return false;
                 }
             }
 
