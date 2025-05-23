@@ -1,13 +1,10 @@
 package visuals;
 
-import GestionBBDD.AddBBDD;
 import GestionBBDD.ConexionBD;
 import Objetos.Producto;
 import interfaces.IPanelSwitcher;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Panel para mostrar y gestionar productos de un supermercado específico - Versión mejorada
+ * Panel para mostrar y gestionar productos de un supermercado específico - Sin funcionalidad de añadir productos
  */
 public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
     private IPanelSwitcher IPanelSwitcher;
@@ -33,12 +30,7 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
     private List<Producto> productos;
     private Map<Producto, Integer> selectedProducts;
 
-    // Componentes para añadir productos
-    private JTextField nombreField;
-    private JTextField precioField;
-
     // Para la base de datos
-    private AddBBDD addBBDD;
     private ConexionBD conexionBD;
 
     // Componente para mostrar carrito
@@ -55,7 +47,6 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
 
         this.idUsuario = getUserId(userNickname);
         this.conexionBD = new ConexionBD();
-        this.addBBDD = new AddBBDD(conexionBD);
 
         setupPanel();
         loadProducts();
@@ -85,25 +76,21 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         JPanel titlePanel = UITheme.createTitlePanel("Productos de " + selectedSupermarket);
         add(titlePanel, BorderLayout.NORTH);
 
-        // Panel central dividido
-        JPanel centerPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+        // Panel central - Lista de productos (ahora ocupa todo el ancho)
+        JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
         centerPanel.setBackground(UITheme.WHITE);
-
-        // Panel izquierdo - Lista de productos
-        JPanel leftPanel = new JPanel(new BorderLayout(10, 10));
-        leftPanel.setBackground(UITheme.WHITE);
-        leftPanel.setBorder(UITheme.RED_TITLED_BORDER("Productos Disponibles"));
+        centerPanel.setBorder(UITheme.RED_TITLED_BORDER("Productos Disponibles"));
 
         productList = new JList<>(productListModel);
         productList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         UITheme.applyListStyle(productList);
 
         JScrollPane scrollPane = new JScrollPane(productList);
-        scrollPane.setPreferredSize(new Dimension(300, 350));
-        leftPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setPreferredSize(new Dimension(600, 350));
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
 
         // Panel de botones para productos
-        JPanel productButtonsPanel = new JPanel(new GridLayout(2, 1, 5, 5));
+        JPanel productButtonsPanel = new JPanel(new GridLayout(1, 2, 15, 5));
         productButtonsPanel.setBackground(UITheme.WHITE);
 
         JButton addToCartButton = new JButton("Añadir al Carrito");
@@ -116,53 +103,8 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
 
         productButtonsPanel.add(addToCartButton);
         productButtonsPanel.add(removeFromCartButton);
-        leftPanel.add(productButtonsPanel, BorderLayout.SOUTH);
+        centerPanel.add(productButtonsPanel, BorderLayout.SOUTH);
 
-        centerPanel.add(leftPanel);
-
-        // Panel derecho - Añadir nuevo producto
-        JPanel rightPanel = new JPanel(new BorderLayout(10, 10));
-        rightPanel.setBackground(UITheme.WHITE);
-        rightPanel.setBorder(UITheme.RED_TITLED_BORDER("Añadir Nuevo Producto"));
-
-        // Formulario
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBackground(UITheme.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        // Campo nombre
-        gbc.gridx = 0; gbc.gridy = 0;
-        JLabel nameLabel = new JLabel("Nombre:");
-        UITheme.applyFormLabelStyle(nameLabel);
-        formPanel.add(nameLabel, gbc);
-
-        gbc.gridx = 1;
-        nombreField = new JTextField(15);
-        UITheme.applyTextFieldStyle(nombreField);
-        formPanel.add(nombreField, gbc);
-
-        // Campo precio
-        gbc.gridx = 0; gbc.gridy = 1;
-        JLabel priceLabel = new JLabel("Precio (€):");
-        UITheme.applyFormLabelStyle(priceLabel);
-        formPanel.add(priceLabel, gbc);
-
-        gbc.gridx = 1;
-        precioField = new JTextField(15);
-        UITheme.applyTextFieldStyle(precioField);
-        formPanel.add(precioField, gbc);
-
-        rightPanel.add(formPanel, BorderLayout.CENTER);
-
-        // Botón añadir producto
-        JButton addProductButton = new JButton("Añadir Producto");
-        UITheme.applyPrimaryButtonStyle(addProductButton);
-        addProductButton.addActionListener(e -> addNewProduct());
-        rightPanel.add(addProductButton, BorderLayout.SOUTH);
-
-        centerPanel.add(rightPanel);
         add(centerPanel, BorderLayout.CENTER);
 
         // Panel inferior con botones principales
@@ -225,55 +167,6 @@ public class SupermarketProductsPanel extends JPanel implements IPanelSwitcher {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
                     "Error al cargar productos: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void addNewProduct() {
-        String nombre = nombreField.getText().trim();
-        String precioText = precioField.getText().trim();
-
-        if (nombre.isEmpty() || precioText.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Por favor, complete todos los campos",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try {
-            float precio = Float.parseFloat(precioText);
-
-            if (precio <= 0) {
-                JOptionPane.showMessageDialog(this,
-                        "El precio debe ser mayor que 0",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            Producto nuevoProducto = new Producto(nombre, precio, 0, idSupermercado);
-            boolean success = addBBDD.add(nuevoProducto);
-
-            if (success) {
-                JOptionPane.showMessageDialog(this,
-                        "✅ Producto añadido correctamente",
-                        "Éxito",
-                        JOptionPane.INFORMATION_MESSAGE);
-                nombreField.setText("");
-                precioField.setText("");
-                loadProducts();
-            } else {
-                JOptionPane.showMessageDialog(this,
-                        "❌ Error al añadir el producto",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this,
-                    "El precio debe ser un número válido",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
