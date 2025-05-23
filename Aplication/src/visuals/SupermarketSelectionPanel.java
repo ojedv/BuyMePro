@@ -116,7 +116,7 @@ public class SupermarketSelectionPanel extends JPanel implements IPanelSwitcher 
                     public void actionPerformed(ActionEvent e) {
                         if (userRole.equals("comprador")) {
                             // Para compradores, ir al panel de actualización de productos
-                            IPanelSwitcher.openPanel(new UpdateProductsPanel(IPanelSwitcher, currentUserNickname, nombreSupermercado));
+                            IPanelSwitcher.openPanel(new UpdateProductsPanel(IPanelSwitcher, currentUserNickname, nombreSupermercado , idSupermercado));
                         } else {
                             // Para solicitantes, ir al panel de gestión de productos del supermercado
                             IPanelSwitcher.openPanel(new SupermarketProductsPanel(IPanelSwitcher, currentUserNickname, nombreSupermercado, idSupermercado));
@@ -145,7 +145,7 @@ public class SupermarketSelectionPanel extends JPanel implements IPanelSwitcher 
 
                 marketButton.addActionListener(event -> {
                     if (userRole.equals("comprador")) {
-                        IPanelSwitcher.openPanel(new UpdateProductsPanel(IPanelSwitcher, currentUserNickname, supermarket));
+                        IPanelSwitcher.openPanel(new UpdateProductsPanel(IPanelSwitcher, currentUserNickname, supermarket, idSupermercado));
                     } else {
                         IPanelSwitcher.openPanel(new SupermarketProductsPanel(IPanelSwitcher, currentUserNickname, supermarket, idSupermercado));
                     }

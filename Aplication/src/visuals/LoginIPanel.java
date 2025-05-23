@@ -4,6 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import GestionBBDD.CheckBBDD;
 import GestionBBDD.ConexionBD;
 import Objetos.Usuario;
@@ -15,6 +20,7 @@ import interfaces.IPanelSwitcher;
 public class LoginIPanel extends JPanel implements IPanelSwitcher {
     // Referencia al gestor de paneles
     private IPanelSwitcher IPanelSwitcher;
+    private String nickname;
 
     // Componentes de la interfaz
     private JTextField nicknameField;
@@ -31,7 +37,7 @@ public class LoginIPanel extends JPanel implements IPanelSwitcher {
      */
     public LoginIPanel(IPanelSwitcher IPanelSwitcher) {
         this.IPanelSwitcher = IPanelSwitcher;
-
+        this.nickname = null;
         // Inicializar el checker para la base de datos
         ConexionBD conexionBD = new ConexionBD();
         this.checker = new CheckBBDD(conexionBD);
@@ -132,10 +138,12 @@ public class LoginIPanel extends JPanel implements IPanelSwitcher {
                             "Error de inicio de sesión",
                             JOptionPane.ERROR_MESSAGE);
                     return;
-                }
+                }else {
+                    if(validarLogin(nicknameField.getText(), passwordField.getPassword())){
+                        IPanelSwitcher.openPanel(new RoleSelectionPanel(IPanelSwitcher, nicknameField.getText()));
+                    }
 
-                // Lógica de inicio de sesión
-                IPanelSwitcher.openPanel(new RoleSelectionPanel(IPanelSwitcher, nicknameField.getText()));
+                }
             }
         });
 
@@ -157,6 +165,28 @@ public class LoginIPanel extends JPanel implements IPanelSwitcher {
         add(titlePanel, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
     }
+    public boolean validarLogin(String nickname, char[] password) {
+        String query = "SELECT contraseña FROM usuario WHERE nickname = ?"; // Cambia "usuarios" por el nombre de tu tabla si es diferente.
+
+        try (Connection connection = ConexionBD.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, nickname);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    String passwordBD = resultSet.getString("contraseña");
+                    return passwordBD.equals(new String(password)); // Comparación con conversión de char[] a String
+                } else {
+                    return false; // El nickname no existe en la base de datos
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al validar login: " + e.getMessage(), e);
+        }
+    }
+
 
     @Override
     public void closePanel(JPanel panel) {

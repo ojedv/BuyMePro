@@ -4,6 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import GestionBBDD.AddBBDD;
 import GestionBBDD.CheckBBDD;
@@ -109,11 +113,9 @@ public class RegisterIPanel extends JPanel implements IPanelSwitcher {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(checker.checkNickname(nicknameField.getText())) {
-                    attemptRegister();
-                } else {
-                    showErrorDialog("El nickname ya está en uso");
-                }
+
+                attemptRegister();
+
             }
         });
 
@@ -175,22 +177,18 @@ public class RegisterIPanel extends JPanel implements IPanelSwitcher {
                 apellidos.isEmpty() || telefono.isEmpty() || correo.isEmpty()) {
             showErrorDialog("Por favor, complete todos los campos");
             return;
-        }
+        }else {
+            if(!validarRegistro(nickname, correo)){
+                showErrorDialog("El nickname o el correo ya están en uso");
+                return;
+            }else {
+                // Crear el usuario
+                Usuario nuevoUsuario = new Usuario(nickname, password, nombre, apellidos, telefono, correo);
 
-        // Crear objeto usuario
-        Usuario nuevoUsuario = new Usuario(nickname, password, nombre, apellidos, telefono, correo);
+                // Guardar en la base de datos
+                adder.add(nuevoUsuario);
 
-        // Verificar si ya existe el usuario
-        if (!checker.check(nuevoUsuario)) {
-            showErrorDialog("El nickname o correo ya están en uso");
-            return;
-        }
-
-        // Intentar añadir el usuario a la base de datos
-        boolean registroExitoso = adder.add(nuevoUsuario);
-
-        if (registroExitoso) {
-            // Usar mensaje personalizado estilizado
+            }
             JOptionPane optionPane = new JOptionPane(
                     "¡Registro exitoso!\nAhora puede iniciar sesión",
                     JOptionPane.INFORMATION_MESSAGE);
@@ -200,8 +198,27 @@ public class RegisterIPanel extends JPanel implements IPanelSwitcher {
 
             // Navegar al panel de login
             IPanelSwitcher.openPanel(new LoginIPanel(IPanelSwitcher));
-        } else {
-            showErrorDialog("Ocurrió un error durante el registro");
+        }
+
+
+
+
+
+            // Usar mensaje personalizado estilizado
+
+
+    }
+    public boolean validarRegistro(String nickname, String correo) {
+        String query = "SELECT nickname, correo FROM usuario WHERE nickname = ? OR correo = ?";
+        try (Connection connection = ConexionBD.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, nickname);
+            statement.setString(2, correo);
+            ResultSet resultSet = statement.executeQuery();
+            return !resultSet.next(); // Si no hay resultados, el registro es válido
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false; // Error en la consulta
         }
     }
 

@@ -16,12 +16,14 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
     private String selectedSupermarket;
     private DefaultListModel<String> productListModel; // Modelo para la lista de productos
     private JList<String> productList; // Componente visual para mostrar productos
+    private int idSupermarket;
 
-    public UpdateProductsPanel(IPanelSwitcher IPanelSwitcher, String userNickname, String supermarket) {
+    public UpdateProductsPanel(IPanelSwitcher IPanelSwitcher, String userNickname, String supermarket, int idSupermarket) {
         this.IPanelSwitcher = IPanelSwitcher;
         this.currentUserNickname = userNickname;
         this.selectedSupermarket = supermarket;
         this.productListModel = new DefaultListModel<>();
+        this.idSupermarket = idSupermarket;
         setupPanel();
     }
 
@@ -68,16 +70,33 @@ public class UpdateProductsPanel extends JPanel implements IPanelSwitcher {
     private void loadProducts() {
         productListModel.clear(); // Limpia la lista actual en el modelo
 
-        try (Connection connection = ConexionBD.getConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT nombre FROM producto");
-             ResultSet rs = ps.executeQuery()) {
+        String query = """
+        SELECT p.nombre, p.precio, u.nickname 
+        FROM producto p
+        INNER JOIN producto_supermercado ps ON p.id_producto = ps.id_producto
+        INNER JOIN usuario u ON ps.id_usuario = u.id_usuario
+        WHERE ps.id_supermercado = ?;
+    """;
 
-            while (rs.next()) {
-                productListModel.addElement(rs.getString("nombre")); // Agrega cada producto al modelo
+        try (Connection connection = ConexionBD.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setInt(1, idSupermarket); // Usa el idSupermarket para filtrar
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String nombre = rs.getString("nombre");
+                    float precio = rs.getFloat("precio");
+                    String nickname = rs.getString("nickname");
+
+                    // Formato: "Producto - Precio - Nickname"
+                    String productoInfo = String.format("%s - %.2f€ - Añadido por: %s", nombre, precio, nickname);
+                    productListModel.addElement(productoInfo); // Agrega cada producto al modelo
+                }
             }
 
             if (productListModel.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No hay productos disponibles.", "Información", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "No hay productos disponibles para este supermercado.", "Información", JOptionPane.INFORMATION_MESSAGE);
             }
 
         } catch (SQLException e) {
